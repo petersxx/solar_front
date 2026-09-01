@@ -259,7 +259,9 @@
     }
 
     /* ── EL OFICIO (tira de video) ───────────────────────── */
-    .oficio { max-width: 1360px; margin: 0 auto; padding: 70px 32px 4px; }
+    /* Cierra la home, debajo de la grilla: linea fina para separarla
+       de los productos y aire abajo antes del footer. */
+    .oficio { max-width: 1360px; margin: 0 auto; padding: 74px 32px 96px; border-top: 1px solid var(--sand); }
     .oficio-head { max-width: 680px; margin: 0 auto 42px; text-align: center; }
     .oficio-kicker { font-size: 11px; letter-spacing: 4px; text-transform: uppercase; color: var(--clay); margin-bottom: 14px; }
     .oficio-title {
@@ -285,7 +287,7 @@
     }
 
     /* ── PRODUCT GRID ───────────────────────────────────── */
-    .catalog { max-width: 1360px; margin: 0 auto; padding: 60px 32px 100px; }
+    .catalog { max-width: 1360px; margin: 0 auto; padding: 60px 32px 76px; }
     .catalog-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 36px; gap: 16px; flex-wrap: wrap; }
     .catalog-title { font-family: var(--serif); font-size: clamp(25px, 4.6vw, 34px); font-weight: 600; }
     .catalog-count { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--ink-soft); }
@@ -513,11 +515,11 @@
 
       .editorial { padding: 52px 20px 12px; }
 
-      .oficio { padding: 46px 20px 0; }
+      .oficio { padding: 52px 20px 64px; }
       .oficio-head { margin-bottom: 30px; }
       .oficio-cap { font-size: 18px; }
 
-      .catalog { padding: 44px 16px 72px; }
+      .catalog { padding: 44px 16px 54px; }
       .catalog-head { margin-bottom: 26px; }
       .grid { grid-template-columns: repeat(2, 1fr); gap: 28px 12px; }
       .card-name { font-size: 16.5px; }
@@ -668,6 +670,21 @@
        de manos artesanas paraguayas. Moda lenta, raíces profundas.</p>
   </section>
 
+  <section class="catalog" id="catalog">
+    <div class="catalog-head">
+      <h2 class="catalog-title" id="catalog-title">La colección</h2>
+      <span class="catalog-count" id="catalog-count"></span>
+    </div>
+    <div id="products-container">
+      <div class="grid">
+        <div><div class="sk sk-img"></div><div class="sk sk-line"></div><div class="sk sk-line short"></div></div>
+        <div><div class="sk sk-img"></div><div class="sk sk-line"></div><div class="sk sk-line short"></div></div>
+        <div><div class="sk sk-img"></div><div class="sk sk-line"></div><div class="sk sk-line short"></div></div>
+        <div><div class="sk sk-img"></div><div class="sk sk-line"></div><div class="sk sk-line short"></div></div>
+      </div>
+    </div>
+  </section>
+
   <section class="oficio">
     <div class="oficio-head">
       <div class="oficio-kicker">Del bastidor a la pasarela</div>
@@ -700,21 +717,6 @@
           en el ropero: se lleva puesta.
         </figcaption>
       </figure>
-    </div>
-  </section>
-
-  <section class="catalog" id="catalog">
-    <div class="catalog-head">
-      <h2 class="catalog-title" id="catalog-title">La colección</h2>
-      <span class="catalog-count" id="catalog-count"></span>
-    </div>
-    <div id="products-container">
-      <div class="grid">
-        <div><div class="sk sk-img"></div><div class="sk sk-line"></div><div class="sk sk-line short"></div></div>
-        <div><div class="sk sk-img"></div><div class="sk sk-line"></div><div class="sk sk-line short"></div></div>
-        <div><div class="sk sk-img"></div><div class="sk sk-line"></div><div class="sk sk-line short"></div></div>
-        <div><div class="sk sk-img"></div><div class="sk sk-line"></div><div class="sk sk-line short"></div></div>
-      </div>
     </div>
   </section>
 </div>
