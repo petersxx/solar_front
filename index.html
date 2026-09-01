@@ -113,11 +113,8 @@
       border: 1px solid var(--ink); font-size: 12px; font-weight: 700;
       letter-spacing: 2.5px; text-transform: uppercase; transition: all .25s;
     }
-    .btn:hover { background: transparent; color: var(--ink); }
     .btn.light { background: transparent; border-color: var(--cream); color: var(--cream); }
-    .btn.light:hover { background: var(--cream); color: var(--ink); }
     .btn.ghost { background: transparent; color: var(--ink); }
-    .btn.ghost:hover { background: var(--ink); color: var(--cream); }
     .btn:disabled { opacity: .45; cursor: default; pointer-events: none; }
 
     /* ── SPLASH ─────────────────────────────────────────── */
@@ -128,8 +125,9 @@
     }
     #splash.hide { opacity: 0; pointer-events: none; }
     .splash-logo {
-      font-family: var(--serif); font-size: 44px; font-weight: 600;
-      letter-spacing: 14px; padding-left: 14px; animation: fadeUp 1s ease both;
+      font-family: var(--serif); font-size: clamp(23px, 7.4vw, 44px); font-weight: 600;
+      letter-spacing: clamp(4px, 2.3vw, 14px); padding-left: clamp(4px, 2.3vw, 14px);
+      animation: fadeUp 1s ease both; text-align: center;
     }
     .splash-sub {
       font-size: 11px; letter-spacing: 4px; text-transform: uppercase;
@@ -146,7 +144,8 @@
     }
     header {
       position: sticky; top: 0; z-index: 500;
-      background: rgba(246,243,236,.94); backdrop-filter: blur(8px);
+      background: rgba(246,243,236,.94);
+      -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
       border-bottom: 1px solid var(--sand);
     }
     .header-inner {
@@ -155,10 +154,18 @@
     }
     .header-left { display: flex; align-items: center; }
     .logo {
-      font-family: var(--serif); font-size: 27px; font-weight: 600;
-      letter-spacing: 10px; padding-left: 10px; cursor: pointer; white-space: nowrap;
+      font-family: var(--serif); font-size: clamp(15px, 4.5vw, 27px); font-weight: 600;
+      letter-spacing: clamp(2px, 1.6vw, 10px); padding-left: clamp(2px, 1.6vw, 10px);
+      cursor: pointer; white-space: nowrap;
     }
-    .header-right { display: flex; align-items: center; justify-content: flex-end; gap: 18px; }
+    .header-right { display: flex; align-items: center; justify-content: flex-end; gap: 6px; }
+
+    /* Lupa que abre el buscador: solo se ve en móvil */
+    .search-toggle {
+      display: none; background: none; border: none; padding: 10px; color: var(--ink);
+      line-height: 0;
+    }
+    .search-toggle svg { width: 21px; height: 21px; }
 
     /* Buscador */
     .search-box { position: relative; width: 100%; max-width: 220px; }
@@ -176,7 +183,7 @@
     }
 
     /* Carrito */
-    .cart-btn { position: relative; background: none; border: none; padding: 6px; color: var(--ink); }
+    .cart-btn { position: relative; background: none; border: none; padding: 10px; color: var(--ink); line-height: 0; }
     .cart-btn svg { width: 22px; height: 22px; }
     .cart-count {
       position: absolute; top: -2px; right: -5px; background: var(--clay); color: #fff;
@@ -190,6 +197,7 @@
     .cat-nav {
       background: var(--cream); border-bottom: 1px solid var(--sand);
       overflow-x: auto; scrollbar-width: none;
+      -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain;
     }
     .cat-nav::-webkit-scrollbar { display: none; }
     .cat-nav-inner {
@@ -203,7 +211,6 @@
       letter-spacing: 2px; text-transform: uppercase; color: var(--ink-soft);
       border-bottom: 2px solid transparent; transition: color .2s, border-color .2s;
     }
-    .cat-link:hover { color: var(--ink); }
     .cat-link.active { color: var(--ink); border-bottom-color: var(--clay); }
 
     /* ── PAGES (SPA) ────────────────────────────────────── */
@@ -216,6 +223,9 @@
       position: relative; height: min(78vh, 680px); min-height: 420px;
       overflow: hidden; background: var(--ink);
     }
+    /* svh = alto real del viewport: evita el salto cuando el navegador
+       del celular esconde/muestra la barra de direcciones */
+    @supports (height: 100svh) { .hero { height: min(78svh, 680px); } }
     .hero-img {
       position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
       opacity: 0; transition: opacity 1.4s ease; transform: scale(1.04);
@@ -234,7 +244,7 @@
     .hero-kicker { font-size: 12px; letter-spacing: 5px; text-transform: uppercase; margin-bottom: 18px; opacity: .92; }
     .hero-title {
       font-family: var(--serif); font-weight: 500; font-style: italic;
-      font-size: clamp(38px, 6vw, 68px); line-height: 1.1; max-width: 750px; margin-bottom: 30px;
+      font-size: clamp(30px, 7.2vw, 68px); line-height: 1.12; max-width: 750px; margin-bottom: 30px;
     }
     .hero-title em { font-style: normal; }
 
@@ -251,7 +261,7 @@
     /* ── PRODUCT GRID ───────────────────────────────────── */
     .catalog { max-width: 1360px; margin: 0 auto; padding: 60px 32px 100px; }
     .catalog-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 36px; gap: 16px; flex-wrap: wrap; }
-    .catalog-title { font-family: var(--serif); font-size: 34px; font-weight: 600; }
+    .catalog-title { font-family: var(--serif); font-size: clamp(25px, 4.6vw, 34px); font-weight: 600; }
     .catalog-count { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--ink-soft); }
 
     .grid {
@@ -266,11 +276,9 @@
       width: 100%; height: 100%; object-fit: cover;
       transition: transform .8s ease, opacity .5s ease;
     }
-    .card:hover .card-img-a { transform: scale(1.05); }
     .card-img-b {
       position: absolute; inset: 0; opacity: 0;
     }
-    .card:hover .card-img-b { opacity: 1; transform: scale(1.05); }
     .card-noimg { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: var(--serif); font-size: 40px; color: #b9ae97; font-style: italic; }
     .card-badge {
       position: absolute; top: 14px; left: 14px; background: var(--cream); color: var(--ink);
@@ -301,7 +309,6 @@
       letter-spacing: 2px; text-transform: uppercase; color: var(--ink-soft);
       display: inline-flex; align-items: center; gap: 8px; margin-bottom: 34px; transition: color .2s;
     }
-    .back-link:hover { color: var(--ink); }
     .detail-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 64px; align-items: start; }
 
     .gallery-main { position: relative; aspect-ratio: 4/5; background: var(--sand); overflow: hidden; margin-bottom: 14px; }
@@ -329,7 +336,6 @@
       border: 1px solid var(--sand); font-size: 12.5px; font-weight: 700;
       letter-spacing: 1px; color: var(--ink); transition: all .2s;
     }
-    .size-btn:hover { border-color: var(--ink); }
     .size-btn.on { background: var(--ink); border-color: var(--ink); color: var(--cream); }
 
     .qty-row { display: flex; align-items: center; gap: 22px; margin-bottom: 26px; }
@@ -338,13 +344,12 @@
       width: 44px; height: 48px; background: none; border: none; font-size: 18px; color: var(--ink);
       transition: background .15s;
     }
-    .qty-ctrl button:hover { background: var(--sand); }
     .qty-ctrl span { min-width: 44px; text-align: center; font-weight: 700; font-size: 15px; }
     .add-btn { width: 100%; max-width: 420px; }
 
     /* ── CART / CHECKOUT ────────────────────────────────── */
     .cart-wrap { max-width: 880px; margin: 0 auto; padding: 60px 32px 100px; }
-    .page-title { font-family: var(--serif); font-size: 38px; font-weight: 600; margin-bottom: 40px; text-align: center; }
+    .page-title { font-family: var(--serif); font-size: clamp(28px, 5.2vw, 38px); font-weight: 600; margin-bottom: 40px; text-align: center; }
     .cart-item {
       display: grid; grid-template-columns: 96px 1fr auto; gap: 20px; align-items: center;
       padding: 22px 0; border-bottom: 1px solid var(--sand);
@@ -355,22 +360,21 @@
     .ci-meta { font-size: 11.5px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 10px; }
     .ci-qty { display: inline-flex; align-items: center; border: 1px solid var(--sand); }
     .ci-qty button { width: 32px; height: 34px; background: none; border: none; font-size: 15px; }
-    .ci-qty button:hover { background: var(--sand); }
     .ci-qty span { min-width: 32px; text-align: center; font-size: 13px; font-weight: 700; }
     .ci-right { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
     .ci-price { font-weight: 700; font-size: 15px; }
     .ci-remove { background: none; border: none; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: #9a927f; text-decoration: underline; }
-    .ci-remove:hover { color: var(--clay); }
 
     .cart-summary { margin-top: 34px; display: flex; flex-direction: column; align-items: flex-end; gap: 18px; }
     .cart-total-row { display: flex; gap: 40px; align-items: baseline; }
     .cart-total-label { font-size: 12px; letter-spacing: 3px; text-transform: uppercase; color: var(--ink-soft); }
-    .cart-total-val { font-family: var(--serif); font-size: 32px; font-weight: 700; }
+    .cart-total-val { font-family: var(--serif); font-size: clamp(26px, 4.6vw, 32px); font-weight: 700; }
 
     /* Checkout */
     .co-section { border: 1px solid var(--sand); background: var(--ivory); padding: 30px 32px; margin-bottom: 22px; }
-    .co-title { font-family: var(--serif); font-size: 23px; font-weight: 600; margin-bottom: 18px; }
+    .co-title { font-family: var(--serif); font-size: clamp(19px, 3.4vw, 23px); font-weight: 600; margin-bottom: 18px; }
     .co-row { display: flex; justify-content: space-between; gap: 16px; padding: 9px 0; border-bottom: 1px solid var(--sand); font-size: 14px; }
+    .co-row > span:last-child, .bank-row b { white-space: nowrap; }
     .co-row:last-child { border-bottom: none; }
     .co-row .muted { color: var(--ink-soft); }
     .co-total { font-weight: 700; font-size: 16px; }
@@ -382,30 +386,28 @@
       width: 100%; padding: 18px; background: #1fa855; color: #fff; border: 1px solid #1fa855;
       font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; transition: background .2s;
     }
-    .wa-btn:hover { background: #178a45; }
 
     /* ── FOOTER ─────────────────────────────────────────── */
     footer { background: var(--ink); color: var(--cream); margin-top: 40px; }
     .footer-inner { max-width: 1360px; margin: 0 auto; padding: 70px 32px 40px; }
     .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 48px; margin-bottom: 54px; }
-    .footer-logo { font-family: var(--serif); font-size: 30px; letter-spacing: 10px; margin-bottom: 14px; }
+    .footer-logo { font-family: var(--serif); font-size: clamp(23px, 6vw, 30px); letter-spacing: clamp(5px, 1.9vw, 10px); margin-bottom: 14px; }
     .footer-tag { font-size: 13.5px; color: #b7ada0; max-width: 320px; line-height: 1.7; }
     .footer-h { font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #b7ada0; margin-bottom: 16px; }
     .footer-col a, .footer-col button {
       display: block; background: none; border: none; color: var(--cream); font-size: 14px;
       padding: 5px 0; text-align: left; transition: color .2s; font-family: var(--sans);
     }
-    .footer-col a:hover, .footer-col button:hover { color: var(--clay); }
     .footer-bottom { border-top: 1px solid rgba(246,243,236,.14); padding-top: 26px; display: flex; justify-content: space-between; gap: 14px; flex-wrap: wrap; font-size: 12px; color: #b7ada0; letter-spacing: 1px; }
 
     /* ── FLOAT WHATSAPP + TOAST ─────────────────────────── */
     .float-btn {
-      position: fixed; right: 22px; bottom: 22px; z-index: 800;
+      position: fixed; right: 22px; z-index: 800;
+      bottom: calc(22px + env(safe-area-inset-bottom, 0px));
       width: 54px; height: 54px; border-radius: 50%; background: #1fa855; color: #fff;
       display: flex; align-items: center; justify-content: center;
       box-shadow: 0 8px 22px rgba(0,0,0,.22); transition: transform .2s;
     }
-    .float-btn:hover { transform: scale(1.08); }
     .float-btn svg { width: 26px; height: 26px; }
 
     #toast {
@@ -416,27 +418,155 @@
     }
     #toast.show { opacity: 1; transform: translate(-50%, 0); }
 
+    /* ── HOVER — solo donde hay mouse ───────────────────────
+       En pantallas táctiles el :hover queda "pegado" después de
+       tocar (la tarjeta se quedaba mostrando la 2ª foto, el botón
+       invertido de color). Por eso todos los efectos de hover
+       viven acá adentro. */
+    @media (hover: hover) and (pointer: fine) {
+      .btn:hover { background: transparent; color: var(--ink); }
+      .btn.light:hover { background: var(--cream); color: var(--ink); }
+      .btn.ghost:hover { background: var(--ink); color: var(--cream); }
+      .cat-link:hover { color: var(--ink); }
+      .card:hover .card-img-a { transform: scale(1.05); }
+      .card:hover .card-img-b { opacity: 1; transform: scale(1.05); }
+      .back-link:hover { color: var(--ink); }
+      .size-btn:hover { border-color: var(--ink); }
+      .qty-ctrl button:hover { background: var(--sand); }
+      .ci-qty button:hover { background: var(--sand); }
+      .ci-remove:hover { color: var(--clay); }
+      .wa-btn:hover { background: #178a45; }
+      .footer-col a:hover, .footer-col button:hover { color: var(--clay); }
+      .float-btn:hover { transform: scale(1.08); }
+    }
+
+    /* En touch, el feedback es al tocar y se va solo */
+    @media (hover: none) {
+      .btn:active, .wa-btn:active, .add-btn:active { opacity: .78; }
+      .card:active .card-img-a { transform: scale(1.03); }
+      .cat-link:active, .size-btn:active, .g-thumb:active { opacity: .65; }
+    }
+
     /* ── RESPONSIVE ─────────────────────────────────────── */
+
+    /* Tablet / notebook chica: solo achicar los márgenes */
+    @media (max-width: 1100px) {
+      .header-inner, .cat-nav-inner, .footer-inner { padding-left: 24px; padding-right: 24px; }
+      .catalog, .detail, .cart-wrap { padding-left: 24px; padding-right: 24px; }
+      .detail-grid { gap: 44px; }
+    }
+
+    /* ── CELULAR ── */
     @media (max-width: 860px) {
-      .header-inner { padding: 0 18px; height: 64px; grid-template-columns: auto 1fr auto; }
-      .logo { font-size: 21px; letter-spacing: 7px; padding-left: 7px; }
-      .header-left { order: 2; justify-content: center; }
+      /* Header compacto en UNA fila: logo + lupa + carrito.
+         El buscador ocupaba lugar y empujaba el logo fuera de la
+         pantalla; ahora se despliega en una 2ª fila al tocar la lupa. */
+      .header-inner {
+        padding: 0 16px; height: auto; min-height: 58px;
+        grid-template-columns: 1fr auto; column-gap: 10px; row-gap: 0;
+        align-items: center;
+      }
+      .logo         { grid-column: 1; grid-row: 1; }
+      .header-right { grid-column: 2; grid-row: 1; }
+      .header-left  { display: none; grid-column: 1 / -1; grid-row: 2; }
+      .header-inner.search-open .header-left { display: block; padding-bottom: 12px; }
+      .search-toggle { display: block; }
       .search-box { max-width: 100%; }
-      .search-box input { font-size: 16px; } /* evita zoom iOS */
-      .cat-nav-inner { padding: 0 18px; gap: 22px; }
-      .catalog, .detail, .cart-wrap { padding-left: 18px; padding-right: 18px; }
-      .grid { grid-template-columns: repeat(2, 1fr); gap: 30px 14px; }
-      .card-name { font-size: 17px; }
-      .detail-grid { grid-template-columns: 1fr; gap: 34px; }
+      /* 16px es el mínimo que no dispara el zoom automático de iOS */
+      .search-box input { font-size: 16px; padding-top: 10px; padding-bottom: 10px; }
+      #search-clear { padding: 8px; right: -4px; }
+
+      .announce { letter-spacing: 1.6px; padding: 8px 14px; font-size: 10.5px; }
+
+      .cat-nav-inner { padding: 0 16px; gap: 20px; }
+      .cat-link { padding: 15px 2px 13px; }   /* área táctil más alta */
+
+      .hero { height: min(66vh, 520px); min-height: 380px; }
+      .hero-kicker { font-size: 11px; letter-spacing: 3.5px; margin-bottom: 13px; }
+      .hero-title { margin-bottom: 24px; }
+
+      .editorial { padding: 52px 20px 12px; }
+
+      .catalog { padding: 44px 16px 72px; }
+      .catalog-head { margin-bottom: 26px; }
+      .grid { grid-template-columns: repeat(2, 1fr); gap: 28px 12px; }
+      .card-name { font-size: 16.5px; }
+      .card-cat { font-size: 10px; letter-spacing: 1.6px; }
+      .card-badge { top: 10px; left: 10px; padding: 5px 9px; font-size: 9.5px; letter-spacing: 1.4px; }
+
+      .detail { padding: 28px 16px 72px; }
+      .back-link { margin-bottom: 22px; }
+      .detail-grid { grid-template-columns: 1fr; gap: 28px; }
       .detail-info { position: static; }
-      .editorial { padding-top: 56px; }
-      .footer-grid { grid-template-columns: 1fr; gap: 34px; }
-      .cart-item { grid-template-columns: 76px 1fr; }
+      .detail-desc { max-width: none; }
+      .g-thumb { width: 60px; height: 74px; }
+      .add-btn { max-width: 100%; }
+
+      .cart-wrap { padding: 40px 16px 80px; }
+      .cart-item { grid-template-columns: 76px 1fr; gap: 14px; }
       .ci-img { width: 76px; height: 94px; }
       .ci-right { grid-column: 1 / -1; flex-direction: row; justify-content: space-between; align-items: center; }
+      .ci-qty button { width: 40px; height: 40px; }   /* área táctil */
+      .ci-qty span { min-width: 36px; }
+      .ci-remove { padding: 6px 0; }
+      .cart-summary { align-items: stretch; }
+      .cart-summary .btn { width: 100%; }
+      .cart-total-row { justify-content: space-between; gap: 20px; }
+
+      .co-section { padding: 22px 18px; }
+
+      .footer-inner { padding: 50px 16px 30px; }
+      .footer-grid { grid-template-columns: 1fr; gap: 30px; margin-bottom: 38px; }
+      .footer-tag { max-width: none; }
+      .footer-col a, .footer-col button { padding: 10px 0; }   /* área táctil */
+      .footer-bottom { flex-direction: column; align-items: flex-start; gap: 8px; }
+
+      .float-btn { right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); width: 50px; height: 50px; }
+      .float-btn svg { width: 24px; height: 24px; }
+      /* El toast a lo ancho: centrado con translate se cortaba en pantallas angostas */
+      #toast {
+        left: 16px; right: 16px; bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+        transform: translateY(18px); text-align: center; padding: 13px 18px;
+      }
+      #toast.show { transform: translateY(0); }
     }
-    @media (max-width: 400px) {
+
+    /* Celular angosto */
+    @media (max-width: 380px) {
+      .grid { gap: 24px 10px; }
+      .cat-nav-inner { gap: 16px; }
+      .qty-row { gap: 14px; }
+      .cart-item { grid-template-columns: 64px 1fr; }
+      .ci-img { width: 64px; height: 80px; }
+    }
+
+    /* Pantallas muy angostas (iPhone SE viejo, 320px) */
+    @media (max-width: 345px) {
+      .header-inner { padding: 0 12px; column-gap: 4px; }
+      .search-toggle, .cart-btn { padding: 9px 6px; }
+      .search-toggle svg { width: 19px; height: 19px; }
+      .cart-btn svg { width: 20px; height: 20px; }
+      .announce { font-size: 10px; letter-spacing: 1.2px; padding: 7px 10px; }
+      .catalog, .detail, .cart-wrap, .footer-inner { padding-left: 13px; padding-right: 13px; }
+      .cat-nav-inner { padding: 0 13px; }
+    }
+
+    /* Pantallas muy chicas: 2 columnas ya no entran */
+    @media (max-width: 330px) {
       .grid { grid-template-columns: 1fr; }
+    }
+
+    /* Celular acostado: el hero no puede tapar toda la pantalla */
+    @media (max-height: 520px) and (orientation: landscape) {
+      .hero { height: 92vh; min-height: 280px; }
+      .editorial { padding-top: 40px; }
+    }
+
+    /* Respetar a quien pidió menos animación en el sistema */
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+      .hero-img.on { animation: none; }
     }
   </style>
 </head>
@@ -462,6 +592,9 @@
     </div>
     <div class="logo" onclick="showPage('home')">SOLAR GUARANI</div>
     <div class="header-right">
+      <button class="search-toggle" id="search-toggle" onclick="toggleSearch()" aria-label="Buscar" aria-expanded="false" aria-controls="search-input">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      </button>
       <button class="cart-btn" onclick="showPage('cart')" aria-label="Ver carrito">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 7h12l1.2 13H4.8L6 7z"/><path d="M9 10V6a3 3 0 0 1 6 0v4"/></svg>
         <span class="cart-count" id="cart-count">0</span>
@@ -728,6 +861,20 @@ function handleSearch(val) {
 function clearSearch() {
   document.getElementById('search-input').value = '';
   handleSearch('');
+}
+
+/*
+ * toggleSearch() — solo actúa en móvil, donde el buscador está
+ * plegado detrás de la lupa (en escritorio siempre está visible).
+ * Al cerrarlo limpia la búsqueda para no dejar el catálogo
+ * filtrado por algo que ya no se ve.
+ */
+function toggleSearch() {
+  const inner = document.querySelector('.header-inner');
+  const open  = inner.classList.toggle('search-open');
+  document.getElementById('search-toggle').setAttribute('aria-expanded', open ? 'true' : 'false');
+  if (open) document.getElementById('search-input').focus();
+  else clearSearch();
 }
 
 /* ── 6. CATÁLOGO ──────────────────────────────────────────── */
