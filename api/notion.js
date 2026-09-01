@@ -1,6 +1,6 @@
 /*
  * ============================================================
- *  api/notion.js  —  Proxy entre la web y Notion (TRAMA)
+ *  api/notion.js  —  Proxy entre la web y Notion (SOLAR GUARANI)
  * ============================================================
  *
  *  La web NO puede hablar con Notion directamente desde el
@@ -19,7 +19,7 @@
  */
 
 // ── ID de la base de datos única en Notion ──────────────────
-const PROD_DB = '3a4459f1-13f9-81c8-b440-f1ebd658da27'; // Base "Productos" (TRAMA)
+const PROD_DB = '3a4459f1-13f9-81c8-b440-f1ebd658da27'; // Base "Productos" (SOLAR GUARANI)
 
 const HEADERS = () => ({
   'Authorization': `Bearer ${process.env.NOTION_TOKEN}`,

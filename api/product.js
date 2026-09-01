@@ -15,7 +15,7 @@ const fs   = require('fs');
 const path = require('path');
 
 const PROD_DB  = '3a4459f1-13f9-81c8-b440-f1ebd658da27';
-const BASE_URL = 'https://trama-moda.vercel.app'; // ← cambiar por el dominio final
+const BASE_URL = 'https://trama-tienda.vercel.app'; // ← cambiar por el dominio final
 const DEFAULT_IMG = 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1200&q=80';
 
 // Debe coincidir con slugify()/productSlug() de index.html y api/sitemap.js
@@ -78,7 +78,7 @@ module.exports = async function handler(req, res) {
     }
 
     const p = match.properties;
-    const name = p.Nombre.title[0]?.plain_text || 'TRAMA';
+    const name = p.Nombre.title[0]?.plain_text || 'SOLAR GUARANI';
 
     const fotoFiles = p.Foto?.files || [];
     const imgs = fotoFiles.map(f => (f.type === 'external' ? f.external.url : f.file.url));
@@ -86,11 +86,11 @@ module.exports = async function handler(req, res) {
     const img = imgs[0] || DEFAULT_IMG;
 
     const rawDesc = (p['Descripción']?.rich_text[0]?.plain_text || '').replace(/\s+/g, ' ').trim();
-    const description = (rawDesc || `Comprá ${name} en TRAMA, tienda de moda online. Envíos a todo el Paraguay.`).slice(0, 160);
+    const description = (rawDesc || `Comprá ${name} en SOLAR GUARANI, moda y artesanía paraguaya. Envíos a todo el Paraguay.`).slice(0, 160);
 
     const canonicalSlug = `${slugify(name)}-${match.id.replace(/-/g, '').slice(-8)}`;
     const url = `${BASE_URL}/producto/${canonicalSlug}`;
-    const title = `${name} | TRAMA — Tienda de Moda`;
+    const title = `${name} | SOLAR GUARANI — Moda y Artesanía Paraguaya`;
 
     let html = baseHtml.replace(/<title>[^<]*<\/title>/, `<title>${escapeHtml(title)}</title>`);
     html = replaceMetaContent(html, 'name', 'description', description);

@@ -1,6 +1,6 @@
 /*
  * ============================================================
- *  api/sitemap.js  —  Sitemap XML dinámico (TRAMA)
+ *  api/sitemap.js  —  Sitemap XML dinámico (SOLAR GUARANI)
  * ============================================================
  *  Genera /sitemap.xml (via rewrite en vercel.json) con la
  *  home y una URL por cada producto disponible en Notion.
@@ -8,7 +8,7 @@
  */
 
 const PROD_DB  = '3a4459f1-13f9-81c8-b440-f1ebd658da27';
-const BASE_URL = 'https://trama-moda.vercel.app'; // ← cambiar por el dominio final
+const BASE_URL = 'https://trama-tienda.vercel.app'; // ← cambiar por el dominio final
 
 function slugify(str) {
   return String(str)

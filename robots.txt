@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://trama-moda.vercel.app/sitemap.xml
+Sitemap: https://trama-tienda.vercel.app/sitemap.xml
