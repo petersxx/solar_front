@@ -258,6 +258,32 @@
       line-height: 1.45; font-weight: 500; color: var(--ink);
     }
 
+    /* ── EL OFICIO (tira de video) ───────────────────────── */
+    .oficio { max-width: 1360px; margin: 0 auto; padding: 70px 32px 4px; }
+    .oficio-head { max-width: 680px; margin: 0 auto 42px; text-align: center; }
+    .oficio-kicker { font-size: 11px; letter-spacing: 4px; text-transform: uppercase; color: var(--clay); margin-bottom: 14px; }
+    .oficio-title {
+      font-family: var(--serif); font-weight: 500; font-style: italic;
+      font-size: clamp(26px, 4.4vw, 40px); line-height: 1.2;
+    }
+    .oficio-grid {
+      display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 40px 34px; max-width: 680px; margin: 0 auto;
+    }
+    .oficio-item { margin: 0; }
+    .oficio-media {
+      position: relative; aspect-ratio: 9 / 16; overflow: hidden;
+      background: var(--sand); margin-bottom: 18px;
+    }
+    .oficio-media video {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+    }
+    .oficio-cap { font-family: var(--serif); font-size: clamp(17px, 1.9vw, 21px); line-height: 1.45; color: var(--ink); }
+    .oficio-cap b {
+      display: block; font-family: var(--sans); font-size: 10px; font-weight: 700;
+      letter-spacing: 3px; text-transform: uppercase; color: var(--clay); margin-bottom: 9px;
+    }
+
     /* ── PRODUCT GRID ───────────────────────────────────── */
     .catalog { max-width: 1360px; margin: 0 auto; padding: 60px 32px 100px; }
     .catalog-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 36px; gap: 16px; flex-wrap: wrap; }
@@ -487,6 +513,10 @@
 
       .editorial { padding: 52px 20px 12px; }
 
+      .oficio { padding: 46px 20px 0; }
+      .oficio-head { margin-bottom: 30px; }
+      .oficio-cap { font-size: 18px; }
+
       .catalog { padding: 44px 16px 72px; }
       .catalog-head { margin-bottom: 26px; }
       .grid { grid-template-columns: repeat(2, 1fr); gap: 28px 12px; }
@@ -532,6 +562,13 @@
     }
 
     /* Celular angosto */
+    /* Los dos clips son verticales: en 2 columnas angostas quedarian
+       de ~140px y la frase sin aire, asi que abajo de 620px se apilan.
+       Arriba (tablet incluida) entran comodos de a dos. */
+    @media (max-width: 620px) {
+      .oficio-grid { grid-template-columns: 1fr; gap: 34px; max-width: 330px; }
+    }
+
     @media (max-width: 380px) {
       .grid { gap: 24px 10px; }
       .cat-nav-inner { gap: 16px; }
@@ -567,6 +604,7 @@
       html { scroll-behavior: auto; }
       *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
       .hero-img.on { animation: none; }
+      /* Los videos no arrancan solos: el JS les pone controles. */
     }
   </style>
 </head>
@@ -628,6 +666,41 @@
     <div class="editorial-kicker">Nuestra esencia</div>
     <p>Cada ñanduti, cada puntada de aopoi y cada hamaca llevan horas de oficio
        de manos artesanas paraguayas. Moda lenta, raíces profundas.</p>
+  </section>
+
+  <section class="oficio">
+    <div class="oficio-head">
+      <div class="oficio-kicker">Del bastidor a la pasarela</div>
+      <h2 class="oficio-title">Lo que nace en las manos,<br>termina caminando.</h2>
+    </div>
+    <div class="oficio-grid">
+      <figure class="oficio-item">
+        <div class="oficio-media">
+          <video src="/img/oficio-nanduti.mp4" poster="/img/oficio-nanduti.jpg"
+                 muted loop playsinline preload="none" disablepictureinpicture
+                 width="254" height="452"
+                 aria-label="Manos de una artesana tejiendo un ñanduti sobre el bastidor"></video>
+        </div>
+        <figcaption class="oficio-cap">
+          <b>El oficio</b>
+          Un ñanduti no se fabrica: se teje. Rueda por rueda, con aguja y
+          paciencia, hasta que la tela parece hecha de luz.
+        </figcaption>
+      </figure>
+      <figure class="oficio-item">
+        <div class="oficio-media">
+          <video src="/img/pasarela.mp4" poster="/img/pasarela.jpg"
+                 muted loop playsinline preload="none" disablepictureinpicture
+                 width="218" height="388"
+                 aria-label="Desfile de moda con prendas de encaje paraguayo"></video>
+        </div>
+        <figcaption class="oficio-cap">
+          <b>La pasarela</b>
+          Y del telar sale a caminar. Artesanía paraguaya que no se guarda
+          en el ropero: se lleva puesta.
+        </figcaption>
+      </figure>
+    </div>
   </section>
 
   <section class="catalog" id="catalog">
@@ -1221,6 +1294,38 @@ loadData().then(() => {
     else history.replaceState(null, '', '/');
   }
 });
+
+// ── Videos del bloque "El oficio" ─────────────────────────
+// Se comportan como GIF (mudos, en bucle) pero pesan 16x menos.
+// preload="none" + IntersectionObserver: no se descarga 1 MB a quien
+// no baja hasta ahi, y se pausan al salir de pantalla para no gastar
+// bateria en el celular.
+(function initOficioVideos() {
+  const vids = document.querySelectorAll('.oficio-media video');
+  if (!vids.length) return;
+
+  // Si el usuario pide menos movimiento, no autoplay: queda el poster
+  // y le damos controles para que lo mire si quiere.
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    vids.forEach(v => { v.controls = true; v.preload = 'metadata'; });
+    return;
+  }
+
+  if (!('IntersectionObserver' in window)) {
+    vids.forEach(v => { v.autoplay = true; v.play().catch(() => {}); });
+    return;
+  }
+
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      const v = e.target;
+      if (e.isIntersecting) v.play().catch(() => {});   // iOS rechaza si no esta mudo
+      else v.pause();
+    });
+  }, { rootMargin: '200px 0px', threshold: 0.15 });
+
+  vids.forEach(v => io.observe(v));
+})();
 
 // Ocultar splash cuando todo está listo
 window.addEventListener('load', () => {
