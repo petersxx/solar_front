@@ -270,7 +270,7 @@
     }
     .oficio-grid {
       display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 40px 34px; max-width: 680px; margin: 0 auto;
+      gap: 44px 36px; max-width: 860px; margin: 0 auto;
     }
     .oficio-item { margin: 0; }
     .oficio-media {
@@ -565,10 +565,10 @@
 
     /* Celular angosto */
     /* Los dos clips son verticales: en 2 columnas angostas quedarian
-       de ~140px y la frase sin aire, asi que abajo de 620px se apilan.
+       de ~180px y la frase sin aire, asi que abajo de 620px se apilan.
        Arriba (tablet incluida) entran comodos de a dos. */
     @media (max-width: 620px) {
-      .oficio-grid { grid-template-columns: 1fr; gap: 34px; max-width: 330px; }
+      .oficio-grid { grid-template-columns: 1fr; gap: 36px; max-width: 420px; }
     }
 
     @media (max-width: 380px) {
@@ -695,7 +695,7 @@
         <div class="oficio-media">
           <video src="/img/oficio-nanduti.mp4" poster="/img/oficio-nanduti.jpg"
                  muted loop playsinline preload="none" disablepictureinpicture
-                 width="254" height="452"
+                 width="540" height="960"
                  aria-label="Manos de una artesana tejiendo un ñanduti sobre el bastidor"></video>
         </div>
         <figcaption class="oficio-cap">
@@ -708,7 +708,7 @@
         <div class="oficio-media">
           <video src="/img/pasarela.mp4" poster="/img/pasarela.jpg"
                  muted loop playsinline preload="none" disablepictureinpicture
-                 width="218" height="388"
+                 width="540" height="960"
                  aria-label="Desfile de moda con prendas de encaje paraguayo"></video>
         </div>
         <figcaption class="oficio-cap">
