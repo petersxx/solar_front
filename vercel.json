@@ -2,10 +2,27 @@
   "functions": {
     "api/product.js": {
       "includeFiles": "index.html"
+    },
+    "api/category.js": {
+      "includeFiles": "index.html"
     }
   },
   "rewrites": [
-    { "source": "/sitemap.xml", "destination": "/api/sitemap" },
-    { "source": "/producto/:slug", "destination": "/api/product?slug=:slug" }
+    {
+      "source": "/sitemap.xml",
+      "destination": "/api/sitemap"
+    },
+    {
+      "source": "/producto/:slug",
+      "destination": "/api/product?slug=:slug"
+    },
+    {
+      "source": "/categoria/:slug",
+      "destination": "/api/category?slug=:slug"
+    },
+    {
+      "source": "/coleccion",
+      "destination": "/index.html"
+    }
   ]
 }

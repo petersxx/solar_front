@@ -40,11 +40,26 @@ async function notionQuery(dbId, body = {}) {
 }
 
 module.exports = async function handler(req, res) {
-  const urls = [{ loc: `${BASE_URL}/`, priority: '1.0' }];
+  const urls = [
+    { loc: `${BASE_URL}/`,           priority: '1.0' },
+    { loc: `${BASE_URL}/coleccion`,  priority: '0.9' },
+  ];
 
   try {
     const prodData = await notionQuery(PROD_DB, {
       filter: { property: 'Disponible', checkbox: { equals: true } },
+    });
+
+    // Categorías: solo las que tienen al menos un producto. Las vacías
+    // se ven en la home pero NO se indexan (una página sin contenido
+    // en el sitemap es solo ruido para Google).
+    const catSlugs = new Set();
+    prodData.results.forEach(r => {
+      const cat = r.properties['Categoría']?.select?.name;
+      if (cat) catSlugs.add(slugify(cat));
+    });
+    [...catSlugs].forEach(slug => {
+      urls.push({ loc: `${BASE_URL}/categoria/${slug}`, priority: '0.9' });
     });
 
     prodData.results.forEach(r => {

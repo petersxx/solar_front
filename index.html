@@ -204,7 +204,16 @@
       display: flex; justify-content: flex-start; gap: 30px;
       max-width: 1360px; margin: 0 auto; padding: 0 32px; white-space: nowrap;
     }
-    @media (min-width: 1000px) { .cat-nav-inner { justify-content: center; } }
+    /* Centrada mientras entre, alineada a la izquierda cuando no.
+       OJO: con justify-content:center un flex que desborda se va para
+       los DOS lados y la parte izquierda queda inalcanzable (no hay
+       scroll negativo). Con width:max-content + margin auto, si entra
+       se centra y si no entra desborda solo a la derecha, que sí se
+       puede scrollear. Se nota desde que se muestran las 13
+       categorías siempre, incluidas las vacías. */
+    @media (min-width: 1000px) {
+      .cat-nav-inner { width: max-content; max-width: min(1360px, 100%); margin-inline: auto; }
+    }
     .cat-link {
       background: none; border: none; padding: 14px 0 12px;
       font-family: var(--sans); font-size: 11.5px; font-weight: 700;
@@ -322,6 +331,56 @@
 
     .empty-msg { text-align: center; padding: 90px 20px; color: var(--ink-soft); }
     .empty-msg .big { font-family: var(--serif); font-size: 26px; font-style: italic; margin-bottom: 10px; color: var(--ink); }
+
+    /* ── CATEGORY GRID (portada) ─────────────────────────
+       La home ya no lista productos: lista categorías. Cada
+       tarjeta usa como portada la foto del primer producto de
+       esa categoría; si todavía no hay ninguno queda el fondo
+       arena con la inicial, y el pie dice "Próximamente". */
+    .cat-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 30px 24px;
+    }
+    .cat-card {
+      position: relative; display: block; width: 100%; padding: 0; margin: 0;
+      border: none; background: none; color: inherit; font-family: inherit;
+      text-align: left; cursor: pointer; overflow: hidden;
+    }
+    .cat-card-img {
+      position: relative; aspect-ratio: 4 / 5; overflow: hidden; background: var(--sand);
+    }
+    .cat-card-img img {
+      width: 100%; height: 100%; object-fit: cover; transition: transform .8s ease;
+    }
+    /* Velo inferior: sin él el nombre en crudo se pierde sobre las
+       fotos claras (mucho lino y mucha pared blanca en el catálogo). */
+    .cat-card-img::after {
+      content: ''; position: absolute; inset: 0; pointer-events: none;
+      background: linear-gradient(to top, rgba(20,17,13,.68) 0%, rgba(20,17,13,.28) 42%, rgba(20,17,13,0) 72%);
+    }
+    .cat-card-init {
+      position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+      font-family: var(--serif); font-style: italic; font-size: 52px; color: #b9ae97;
+    }
+    .cat-card-body { position: absolute; left: 0; right: 0; bottom: 0; padding: 22px 22px 20px; }
+    .cat-card-name {
+      font-family: var(--serif); font-size: clamp(21px, 2.3vw, 26px); font-weight: 600;
+      line-height: 1.2; color: var(--cream);
+    }
+    .cat-card-count {
+      margin-top: 7px; font-size: 10.5px; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; color: rgba(246, 243, 236, .78);
+    }
+    /* Sin foto no hay nada que oscurecer: el velo sobre el fondo arena
+       solo ensucia. La tarjeta vacía queda clara, con el texto en tinta
+       y un filete que la sostiene como pieza del mismo sistema. */
+    .cat-card.is-empty .cat-card-img { border: 1px solid #ddd4c2; }
+    .cat-card.is-empty .cat-card-img::after { display: none; }
+    .cat-card.is-empty .cat-card-name  { color: var(--ink); }
+    .cat-card.is-empty .cat-card-count { color: var(--ink-soft); }
+
+    /* "Ver todas las piezas" al pie de la grilla de categorías */
+    .cat-grid-foot { text-align: center; margin-top: 54px; }
 
     /* Skeleton de carga */
     .sk { animation: pulse 1.4s ease infinite; background: var(--sand); }
@@ -456,6 +515,7 @@
       .btn.light:hover { background: var(--cream); color: var(--ink); }
       .btn.ghost:hover { background: var(--ink); color: var(--cream); }
       .cat-link:hover { color: var(--ink); }
+      .cat-card:hover .cat-card-img img { transform: scale(1.05); }
       .card:hover .card-img-a { transform: scale(1.05); }
       .card:hover .card-img-b { opacity: 1; transform: scale(1.05); }
       .back-link:hover { color: var(--ink); }
@@ -471,6 +531,7 @@
     /* En touch, el feedback es al tocar y se va solo */
     @media (hover: none) {
       .btn:active, .wa-btn:active, .add-btn:active { opacity: .78; }
+      .cat-card:active .cat-card-img img { transform: scale(1.03); }
       .card:active .card-img-a { transform: scale(1.03); }
       .cat-link:active, .size-btn:active, .g-thumb:active { opacity: .65; }
     }
@@ -522,6 +583,12 @@
       .catalog { padding: 44px 16px 54px; }
       .catalog-head { margin-bottom: 26px; }
       .grid { grid-template-columns: repeat(2, 1fr); gap: 28px 12px; }
+      .cat-grid { grid-template-columns: repeat(2, 1fr); gap: 16px 12px; }
+      .cat-card-body { padding: 14px 14px 13px; }
+      .cat-card-name { font-size: 17px; }
+      .cat-card-count { margin-top: 5px; font-size: 9.5px; letter-spacing: 1.6px; }
+      .cat-card-init { font-size: 40px; }
+      .cat-grid-foot { margin-top: 38px; }
       .card-name { font-size: 16.5px; }
       .card-cat { font-size: 10px; letter-spacing: 1.6px; }
       .card-badge { top: 10px; left: 10px; padding: 5px 9px; font-size: 9.5px; letter-spacing: 1.4px; }
@@ -573,6 +640,7 @@
 
     @media (max-width: 380px) {
       .grid { gap: 24px 10px; }
+      .cat-grid { gap: 14px 10px; }
       .cat-nav-inner { gap: 16px; }
       .qty-row { gap: 14px; }
       .cart-item { grid-template-columns: 64px 1fr; }
@@ -592,7 +660,7 @@
 
     /* Pantallas muy chicas: 2 columnas ya no entran */
     @media (max-width: 330px) {
-      .grid { grid-template-columns: 1fr; }
+      .grid, .cat-grid { grid-template-columns: 1fr; }
     }
 
     /* Celular acostado: el hero no puede tapar toda la pantalla */
@@ -646,7 +714,7 @@
 <!-- ── CATEGORY NAV ───────────────────────────────────────── -->
 <nav class="cat-nav" id="cat-nav">
   <div class="cat-nav-inner" id="cat-nav-inner">
-    <button class="cat-link active" onclick="setFilter('all', this)">Todo</button>
+    <button class="cat-link active" onclick="showAll()">Todo</button>
   </div>
 </nav>
 
@@ -672,15 +740,15 @@
 
   <section class="catalog" id="catalog">
     <div class="catalog-head">
-      <h2 class="catalog-title" id="catalog-title">La colección</h2>
-      <span class="catalog-count" id="catalog-count"></span>
+      <h2 class="catalog-title">La colección</h2>
+      <span class="catalog-count" id="home-cat-count"></span>
     </div>
-    <div id="products-container">
-      <div class="grid">
-        <div><div class="sk sk-img"></div><div class="sk sk-line"></div><div class="sk sk-line short"></div></div>
-        <div><div class="sk sk-img"></div><div class="sk sk-line"></div><div class="sk sk-line short"></div></div>
-        <div><div class="sk sk-img"></div><div class="sk sk-line"></div><div class="sk sk-line short"></div></div>
-        <div><div class="sk sk-img"></div><div class="sk sk-line"></div><div class="sk sk-line short"></div></div>
+    <div id="categories-container">
+      <div class="cat-grid">
+        <div><div class="sk sk-img"></div></div>
+        <div><div class="sk sk-img"></div></div>
+        <div><div class="sk sk-img"></div></div>
+        <div><div class="sk sk-img"></div></div>
       </div>
     </div>
   </section>
@@ -721,6 +789,29 @@
   </section>
 </div>
 
+<!-- ── CATEGORÍA / LISTADO DE PRODUCTOS ───────────────────── -->
+<!-- Una sola pantalla sirve para los tres listados: una categoría
+     puntual (/categoria/:slug), todas las piezas (/coleccion) y los
+     resultados de búsqueda (/buscar?q=). Cambia el título, no la
+     estructura. -->
+<div id="page-category" class="page">
+  <section class="catalog">
+    <button class="back-link" onclick="showPage('home')">← Volver a las categorías</button>
+    <div class="catalog-head">
+      <h2 class="catalog-title" id="catalog-title">La colección</h2>
+      <span class="catalog-count" id="catalog-count"></span>
+    </div>
+    <div id="products-container">
+      <div class="grid">
+        <div><div class="sk sk-img"></div><div class="sk sk-line"></div><div class="sk sk-line short"></div></div>
+        <div><div class="sk sk-img"></div><div class="sk sk-line"></div><div class="sk sk-line short"></div></div>
+        <div><div class="sk sk-img"></div><div class="sk sk-line"></div><div class="sk sk-line short"></div></div>
+        <div><div class="sk sk-img"></div><div class="sk sk-line"></div><div class="sk sk-line short"></div></div>
+      </div>
+    </div>
+  </section>
+</div>
+
 <!-- ── PRODUCT DETAIL ─────────────────────────────────────── -->
 <div id="page-product" class="page">
   <div class="detail" id="product-detail"></div>
@@ -753,7 +844,8 @@
       </div>
       <div class="footer-col">
         <div class="footer-h">Tienda</div>
-        <button onclick="showPage('home')">Colección</button>
+        <button onclick="showPage('home')">Categorías</button>
+        <button onclick="showAll()">Todas las piezas</button>
         <button onclick="showPage('cart')">Carrito</button>
       </div>
       <div class="footer-col">
@@ -878,6 +970,24 @@ function setMeta({ title, description, ogImage, url }) {
   document.querySelector('link[rel="canonical"]')?.setAttribute('href', url);
 }
 function updateMetaForPage(page, id) {
+  if (page === 'category') {
+    const c = categories.find(x => x.slug === id);
+    if (!c) {
+      setMeta({
+        ...DEFAULT_META,
+        title: 'Todas las piezas | SOLAR GUARANI — Moda y Artesanía Paraguaya',
+        url: CONFIG.baseUrl + '/coleccion',
+      });
+      return;
+    }
+    setMeta({
+      title: `${c.name} | SOLAR GUARANI — Moda y Artesanía Paraguaya`,
+      description: `${c.name} en SOLAR GUARANI: moda y artesanía paraguaya hecha a mano. Envíos a todo el país, pedidos por WhatsApp.`,
+      ogImage: c.cover || DEFAULT_META.ogImage,
+      url: CONFIG.baseUrl + '/categoria/' + c.slug,
+    });
+    return;
+  }
   if (page === 'product') {
     const p = products.find(x => x.id === id);
     if (!p) return;
@@ -892,32 +1002,81 @@ function updateMetaForPage(page, id) {
   }
 }
 
+/*
+ * urlForPage() — la URL que le corresponde a cada pantalla.
+ *   home      → /
+ *   category  → /categoria/:slug   (o /coleccion si es "todas")
+ *   product   → /producto/:slug
+ * El carrito y el checkout no tienen URL propia: son pasos, no
+ * páginas para compartir, así que se quedan en la de origen.
+ */
+function urlForPage(page, id) {
+  if (page === 'product')  return urlForProduct(id);
+  if (page === 'category') return (id && id !== 'all') ? `/categoria/${id}` : '/coleccion';
+  if (page === 'home')     return '/';
+  return null;
+}
+
+/*
+ * showPage(page, id) — page: home | category | product | cart | checkout
+ *   · en 'category', id es el slug ('all' = todas las piezas)
+ *   · fromHistory=true cuando lo dispara el ruteo (popstate o la
+ *     carga inicial), para no volver a apilar la misma URL
+ */
 function showPage(page, id, fromHistory) {
+  // Volver a la portada limpia la búsqueda: la home no muestra
+  // resultados, y dejarla activa filtraría en silencio el listado.
+  if (page === 'home') resetSearch();
+
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('cat-nav').style.display = page === 'home' ? '' : 'none';
+  // La tira de categorías solo aparece cuando se están mirando piezas:
+  // en la portada la lista de categorías YA es el contenido principal.
+  document.getElementById('cat-nav').style.display =
+    (page === 'category' || page === 'product') ? '' : 'none';
   document.getElementById('page-' + page).classList.add('active');
   window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  if (page === 'category') { currentFilter = id || 'all'; renderCategories(); renderProducts(); }
   if (page === 'product')  renderProductDetail(id);
   if (page === 'cart')     renderCart();
   if (page === 'checkout') renderCheckout();
 
   if (!fromHistory) {
-    const url = page === 'product' ? urlForProduct(id) : '/';
+    const url = urlForPage(page, id);
     if (url && location.pathname !== url) history.pushState({ page, id }, '', url);
   }
   updateMetaForPage(page, id);
 }
 
-function handlePopState() {
-  const path = location.pathname;
+function goCategory(slug) { showPage('category', slug); }
+function showAll()        { showPage('category', 'all'); }
+
+/*
+ * routeFromUrl() — traduce la URL actual a una pantalla. Se usa en
+ * la carga inicial y en cada popstate (botón atrás del navegador).
+ * Necesita los datos ya cargados: los slugs se validan contra ellos.
+ */
+function routeFromUrl() {
+  const path = decodeURIComponent(location.pathname).replace(/\/+$/, '') || '/';
+
   if (path.startsWith('/producto/')) {
-    const slug = decodeURIComponent(path.replace(/^\/producto\//, '').replace(/\/$/, ''));
-    const p = findProductBySlug(slug);
-    if (p) { showPage('product', p.id, true); return; }
+    const p = findProductBySlug(path.replace(/^\/producto\//, ''));
+    if (p) return showPage('product', p.id, true);
+  } else if (path.startsWith('/categoria/')) {
+    const slug = path.replace(/^\/categoria\//, '');
+    if (categories.some(c => c.slug === slug)) return showPage('category', slug, true);
+  } else if (path === '/coleccion') {
+    return showPage('category', 'all', true);
+  } else if (path === '/') {
+    return showPage('home', null, true);
   }
+
+  // URL que no existe (categoría borrada, producto dado de baja):
+  // se cae a la portada y se corrige la barra de direcciones.
+  history.replaceState(null, '', '/');
   showPage('home', null, true);
 }
-window.addEventListener('popstate', handlePopState);
+window.addEventListener('popstate', routeFromUrl);
 
 /* ── 5. BÚSQUEDA ──────────────────────────────────────────── */
 let searchQuery = '';
@@ -929,10 +1088,25 @@ function handleSearch(val) {
     searchQuery = val.trim().toLowerCase();
     document.getElementById('search-clear').style.display = searchQuery ? 'block' : 'none';
     document.getElementById('search-icon').style.display  = searchQuery ? 'none'  : 'block';
-    if (searchQuery) showPage('home');
-    renderProducts();
+
+    // Buscar saca de la portada: los resultados se ven en el listado.
+    // Si ya se está en el listado no se re-navega, así el buscador no
+    // reinicia la animación de página en cada tecla.
+    const onListing = document.getElementById('page-category').classList.contains('active');
+    if (searchQuery && !onListing) showPage('category', currentFilter);
+    else renderProducts();
   }, 180);
 }
+
+/* Deja el buscador y el estado en cero, sin renderizar nada. */
+function resetSearch() {
+  if (!searchQuery && !document.getElementById('search-input').value) return;
+  searchQuery = '';
+  document.getElementById('search-input').value = '';
+  document.getElementById('search-clear').style.display = 'none';
+  document.getElementById('search-icon').style.display  = 'block';
+}
+
 function clearSearch() {
   document.getElementById('search-input').value = '';
   handleSearch('');
@@ -952,21 +1126,71 @@ function toggleSearch() {
   else clearSearch();
 }
 
-/* ── 6. CATÁLOGO ──────────────────────────────────────────── */
+/* ── 6. CATEGORÍAS Y CATÁLOGO ─────────────────────────────── */
 function renderCategories() {
+  // Tira superior (solo visible dentro del listado y del detalle)
   const nav = document.getElementById('cat-nav-inner');
-  nav.innerHTML = `<button class="cat-link ${currentFilter === 'all' ? 'active' : ''}" onclick="setFilter('all', this)">Todo</button>` +
+  nav.innerHTML =
+    `<button class="cat-link ${currentFilter === 'all' ? 'active' : ''}" onclick="showAll()">Todo</button>` +
     categories.map(c =>
-      `<button class="cat-link ${currentFilter === c.slug ? 'active' : ''}" onclick="setFilter('${c.slug}', this)">${escapeHtml(c.name)}</button>`
+      `<button class="cat-link ${currentFilter === c.slug ? 'active' : ''}" onclick="goCategory('${c.slug}')">${escapeHtml(c.name)}</button>`
     ).join('');
+
+  // Que la pestaña activa se vea sin tener que arrastrar la tira
+  // (con 13 categorías no entran todas en pantalla).
+  const activa = nav.querySelector('.cat-link.active');
+  if (activa) {
+    const barra = document.getElementById('cat-nav');
+    barra.scrollLeft = activa.offsetLeft - (barra.clientWidth - activa.offsetWidth) / 2;
+  }
+
+  renderCategoryGrid();
 }
 
-function setFilter(slug, btn) {
-  currentFilter = slug;
-  document.querySelectorAll('.cat-link').forEach(b => b.classList.remove('active'));
-  if (btn) btn.classList.add('active');
-  renderProducts();
-  scrollToCatalog();
+/*
+ * renderCategoryGrid() — la portada. Se muestran TODAS las categorías,
+ * también las que todavía no tienen piezas: son la estructura de la
+ * tienda, no un listado de stock. Las vacías van marcadas
+ * "Próximamente" y su página avisa lo mismo.
+ * La portada de cada tarjeta es la foto del primer producto de esa
+ * categoría (la calcula api/notion.js); si no hay, queda la inicial.
+ */
+function renderCategoryGrid() {
+  const wrap  = document.getElementById('categories-container');
+  const count = document.getElementById('home-cat-count');
+
+  if (!categories.length) {
+    count.textContent = '';
+    wrap.innerHTML = `<div class="empty-msg">
+      <div class="big">Todavía no hay categorías</div>
+      <p>Estamos preparando la colección. Volvé en unos días.</p>
+    </div>`;
+    return;
+  }
+
+  count.textContent = `${categories.length} categoría${categories.length === 1 ? '' : 's'}`;
+
+  const cards = categories.map(c => {
+    const n = c.count || 0;
+    const cover = c.cover
+      ? `<img src="${escapeHtml(c.cover)}" alt="${escapeHtml(c.name)}" loading="lazy">`
+      : `<div class="cat-card-init">${escapeHtml(c.name.trim().charAt(0).toUpperCase())}</div>`;
+    return `
+      <button class="cat-card${n ? '' : ' is-empty'}" onclick="goCategory('${c.slug}')" aria-label="Ver ${escapeHtml(c.name)}">
+        <div class="cat-card-img">${cover}</div>
+        <div class="cat-card-body">
+          <div class="cat-card-name">${escapeHtml(c.name)}</div>
+          <div class="cat-card-count">${n ? `${n} pieza${n === 1 ? '' : 's'}` : 'Próximamente'}</div>
+        </div>
+      </button>`;
+  }).join('');
+
+  // El "ver todo" solo tiene sentido si hay algo que ver
+  const foot = products.length
+    ? `<div class="cat-grid-foot"><button class="btn ghost" onclick="showAll()">Ver todas las piezas</button></div>`
+    : '';
+
+  wrap.innerHTML = `<div class="cat-grid">${cards}</div>${foot}`;
 }
 
 function getVisibleProducts() {
@@ -988,20 +1212,34 @@ function renderProducts() {
   const wrap = document.getElementById('products-container');
   const list = getVisibleProducts();
 
+  const scope = currentFilter === 'all' ? 'Todas las piezas' : catName(currentFilter);
   document.getElementById('catalog-title').textContent =
-    searchQuery ? `Resultados para “${searchQuery}”`
-    : currentFilter === 'all' ? 'La colección'
-    : catName(currentFilter);
+    searchQuery ? `Resultados para “${searchQuery}”` : scope;
   document.getElementById('catalog-count').textContent =
     list.length ? `${list.length} pieza${list.length === 1 ? '' : 's'}` : '';
 
   if (!list.length) {
-    wrap.innerHTML = `<div class="empty-msg">
-      <div class="big">No encontramos piezas</div>
-      <p>Probá con otra búsqueda u otra categoría.</p>
-    </div>`;
+    // Se distinguen los dos vacíos: una búsqueda sin resultados es un
+    // callejón sin salida, una categoría sin cargar todavía es una
+    // promesa. No deberían decir lo mismo.
+    wrap.innerHTML = searchQuery
+      ? `<div class="empty-msg">
+          <div class="big">No encontramos piezas</div>
+          <p>Probá con otra búsqueda u otra categoría.</p>
+        </div>`
+      : `<div class="empty-msg">
+          <div class="big">Todavía no hay piezas acá</div>
+          <p>Estamos tejiendo${scope && currentFilter !== 'all' ? ` la colección de ${escapeHtml(scope.toLowerCase())}` : ''}.
+             Escribinos por WhatsApp y te avisamos cuando lleguen.</p>
+          <button class="btn ghost" onclick="showPage('home')" style="margin-top:22px">Ver otras categorías</button>
+        </div>`;
     return;
   }
+
+  // Dentro de una categoría el rótulo de cada tarjeta repetiría el
+  // título de la página tres veces; solo se muestra donde se mezclan
+  // categorías (todas las piezas y resultados de búsqueda).
+  const showCat = currentFilter === 'all' || !!searchQuery;
 
   wrap.innerHTML = `<div class="grid">` + list.map(p => {
     const imgA = p.img
@@ -1019,7 +1257,7 @@ function renderProducts() {
           ${imgA}${imgB}
           ${p.badge ? `<span class="card-badge">${escapeHtml(p.badge)}</span>` : ''}
         </div>
-        <div class="card-cat">${escapeHtml(catName(p.category))}</div>
+        ${showCat && p.category ? `<div class="card-cat">${escapeHtml(catName(p.category))}</div>` : ''}
         <h3 class="card-name">${escapeHtml(p.name)}</h3>
         <div class="card-price">${price}</div>
         ${stockTag(p.stock)}
@@ -1060,8 +1298,16 @@ function renderProductDetail(id) {
 
   const soldOut = p.stock === 0;
 
+  // El "volver" apunta a la categoría de la pieza, que es de donde se
+  // llegó en el 99% de los casos (y adonde conviene volver si el link
+  // se abrió directo desde WhatsApp o Google).
+  const catLabel = p.category ? catName(p.category) : '';
+  const backTo = catLabel
+    ? { action: `goCategory('${p.category}')`, label: catLabel.toLowerCase() }
+    : { action: `showPage('home')`, label: 'la colección' };
+
   wrap.innerHTML = `
-    <button class="back-link" onclick="showPage('home')">← Volver a la colección</button>
+    <button class="back-link" onclick="${backTo.action}">← Volver a ${escapeHtml(backTo.label)}</button>
     <div class="detail-grid">
       <div>${gallery}</div>
       <div class="detail-info">
@@ -1266,12 +1512,16 @@ async function loadData() {
     renderProducts();
   } catch (err) {
     console.error(err);
-    document.getElementById('products-container').innerHTML = `
+    // El error va en los dos contenedores: no sabemos en cuál de las
+    // dos pantallas está parado el visitante cuando falla la carga.
+    const msg = `
       <div class="empty-msg">
         <div class="big">No pudimos cargar la tienda</div>
         <p>Revisá tu conexión e intentá de nuevo.</p>
         <button class="btn" onclick="loadData()" style="margin-top:22px">Reintentar</button>
       </div>`;
+    document.getElementById('categories-container').innerHTML = msg;
+    document.getElementById('products-container').innerHTML   = msg;
   }
 }
 
@@ -1286,16 +1536,9 @@ document.getElementById('footer-wa').href = waGeneric;
 startHero();
 updateCartBadge();
 
-loadData().then(() => {
-  // Enrutamiento inicial: si entraron directo a /producto/:slug
-  const path = location.pathname;
-  if (path.startsWith('/producto/')) {
-    const slug = decodeURIComponent(path.replace(/^\/producto\//, '').replace(/\/$/, ''));
-    const p = findProductBySlug(slug);
-    if (p) showPage('product', p.id, true);
-    else history.replaceState(null, '', '/');
-  }
-});
+// Enrutamiento inicial: recién con los datos cargados se pueden
+// validar los slugs de /categoria/:slug y /producto/:slug.
+loadData().then(routeFromUrl);
 
 // ── Videos del bloque "El oficio" ─────────────────────────
 // Se comportan como GIF (mudos, en bucle) pero pesan 16x menos.

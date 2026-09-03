@@ -108,14 +108,25 @@ module.exports = async function handler(req, res) {
     });
 
     // ── Categorías ───────────────────────────────────────────
-    // Salen de las opciones del select "Categoría" (en su orden
-    // de Notion). Solo mostramos las que tienen productos
-    // disponibles para no renderizar pestañas vacías.
-    const usedSlugs = new Set(products.map(p => p.category).filter(Boolean));
+    // Salen de las opciones del select "Categoría", en su orden de
+    // Notion. Se devuelven TODAS, también las vacías: desde que la
+    // home es la lista de categorías, filtrar las que no tienen
+    // productos dejaría la portada en blanco. La tienda las muestra
+    // igual, marcadas como "Próximamente".
+    //   count → productos disponibles en esa categoría
+    //   cover → foto del primer producto que tenga, para la portada
     const options = schema.properties?.['Categoría']?.select?.options || [];
-    const categories = options
-      .map(o => ({ id: o.id, name: o.name, slug: slugify(o.name) }))
-      .filter(c => usedSlugs.has(c.slug));
+    const categories = options.map(o => {
+      const slug = slugify(o.name);
+      const inCat = products.filter(p => p.category === slug);
+      return {
+        id: o.id,
+        name: o.name,
+        slug,
+        count: inCat.length,
+        cover: inCat.find(p => p.img)?.img || null,
+      };
+    });
 
     // Caché de 10s en el edge de Vercel (+50s stale-while-revalidate)
     res.setHeader('Cache-Control', 's-maxage=10, stale-while-revalidate=50');
