@@ -5,6 +5,9 @@
     },
     "api/category.js": {
       "includeFiles": "index.html"
+    },
+    "api/group.js": {
+      "includeFiles": "index.html"
     }
   },
   "rewrites": [
@@ -19,6 +22,14 @@
     {
       "source": "/categoria/:slug",
       "destination": "/api/category?slug=:slug"
+    },
+    {
+      "source": "/artesanias",
+      "destination": "/api/group?slug=artesanias"
+    },
+    {
+      "source": "/ropas",
+      "destination": "/api/group?slug=ropas"
     },
     {
       "source": "/coleccion",

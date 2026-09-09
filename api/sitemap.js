@@ -7,16 +7,10 @@
  * ============================================================
  */
 
+const { GROUPS, slugify } = require('./_groups');
+
 const PROD_DB  = '3a4459f1-13f9-81c8-b440-f1ebd658da27';
 const BASE_URL = 'https://trama-tienda.vercel.app'; // ← cambiar por el dominio final
-
-function slugify(str) {
-  return String(str)
-    .toLowerCase()
-    .normalize('NFD').replace(/[̀-ͯ]/g, '')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-}
 
 async function notionQuery(dbId, body = {}) {
   const results = [];
@@ -40,8 +34,11 @@ async function notionQuery(dbId, body = {}) {
 }
 
 module.exports = async function handler(req, res) {
+  // Las dos páginas de grupo van siempre, aunque estén vacías: son
+  // la portada de cada mitad de la tienda y lo que la home enlaza.
   const urls = [
     { loc: `${BASE_URL}/`,           priority: '1.0' },
+    ...GROUPS.map(g => ({ loc: `${BASE_URL}/${g.slug}`, priority: '0.95' })),
     { loc: `${BASE_URL}/coleccion`,  priority: '0.9' },
   ];
 

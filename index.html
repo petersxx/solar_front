@@ -382,10 +382,88 @@
     /* "Ver todas las piezas" al pie de la grilla de categorías */
     .cat-grid-foot { text-align: center; margin-top: 54px; }
 
+    /* ── GROUP GRID (portada) ────────────────────────────
+       La portada ya no lista las 13 categorías: lista los DOS
+       grupos, ARTESANÍAS y ROPAS. Son la puerta de entrada, así
+       que van más grandes que una tarjeta de categoría y con una
+       bajada de texto. Las categorías quedan un nivel más abajo,
+       dentro de la página de cada grupo. */
+    /* Angosta y centrada, no a los 1360px del catálogo: a lo ancho
+       completo cada tarjeta mediría ~660px y, con proporción
+       vertical, quedaría más alta que la pantalla y con el nombre
+       del grupo fuera de vista. (Un max-height NO sirve acá: sobre
+       una caja con aspect-ratio le encoge también el ancho y la
+       tarjeta deja de llenar su celda.) */
+    .group-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 26px;
+      max-width: 1000px; margin-inline: auto;
+    }
+    .group-grid .cat-card-img  { aspect-ratio: 4 / 5; }
+    /* El encabezado de la home se alinea con la grilla angosta, no
+       con los 1360px del catálogo */
+    #page-home .catalog-head { max-width: 1000px; margin-inline: auto; }
+    .group-grid .cat-card-body { padding: 32px 30px 28px; }
+    /* Velo más cargado que en las categorías: acá hay tres líneas de
+       texto sobre la foto, no una. */
+    .group-grid .cat-card-img::after {
+      background: linear-gradient(to top, rgba(20,17,13,.80) 0%, rgba(20,17,13,.46) 48%, rgba(20,17,13,.06) 88%);
+    }
+    .group-card-name {
+      font-family: var(--serif); font-size: clamp(28px, 3.7vw, 46px); font-weight: 600;
+      line-height: 1.08; color: var(--cream);
+    }
+    .group-card-tag {
+      margin-top: 11px; font-size: 13.5px; line-height: 1.55; max-width: 34ch;
+      color: rgba(246, 243, 236, .86);
+    }
+    .group-card-count {
+      margin-top: 15px; font-size: 10.5px; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; color: rgba(246, 243, 236, .72);
+    }
+    /* La inicial de un grupo sin foto se centra en el espacio LIBRE,
+       no en la tarjeta entera: el bloque de texto de un grupo ocupa
+       tres líneas contra la única de una categoría, y centrada se le
+       montaba encima. */
+    .group-grid .cat-card-init { padding-bottom: 45%; }
+
+    /* Grupo todavía sin ninguna foto: misma lógica que la categoría
+       vacía (ver .cat-card.is-empty), tarjeta clara y texto en tinta. */
+    .cat-card.is-empty .group-card-name  { color: var(--ink); }
+    .cat-card.is-empty .group-card-tag,
+    .cat-card.is-empty .group-card-count { color: var(--ink-soft); }
+
+    /* Breakpoint propio: dos tarjetas de 3/4 lado a lado se vuelven
+       dos torres angostas antes de que el celular las apile por el
+       breakpoint general. Abajo de 700px van una debajo de la otra,
+       apaisadas, para que las dos entren en la primera pantalla. */
+    @media (max-width: 700px) {
+      .group-grid { grid-template-columns: 1fr; gap: 18px; }
+      .group-grid .cat-card-img  { aspect-ratio: 16 / 10; }
+      .group-grid .cat-card-body { padding: 22px 20px 20px; }
+      .group-card-tag   { font-size: 12.5px; margin-top: 8px; }
+      .group-card-count { margin-top: 10px; }
+    }
+
+    /* ── PÁGINA DE GRUPO ─────────────────────────────────
+       Arriba las categorías del grupo, abajo todas sus piezas.
+       Hoy 11 de 13 categorías están vacías: una página que fuera
+       solo tarjetas "Próximamente" no mostraría nada que comprar. */
+    .group-pieces { margin-top: 78px; border-top: 1px solid var(--sand); padding-top: 44px; }
+    .group-lead {
+      font-family: var(--serif); font-size: clamp(16px, 2vw, 19px); font-style: italic;
+      color: var(--ink-soft); max-width: 52ch; margin: -18px 0 38px;
+    }
+    @media (max-width: 860px) {
+      .group-pieces { margin-top: 54px; padding-top: 32px; }
+      .group-lead   { margin: -10px 0 28px; }
+    }
+
     /* Skeleton de carga */
     .sk { animation: pulse 1.4s ease infinite; background: var(--sand); }
     @keyframes pulse { 0%,100% { opacity: .55; } 50% { opacity: 1; } }
     .sk-img { aspect-ratio: 4/5; margin-bottom: 16px; }
+    .group-grid .sk-img { aspect-ratio: 4/5; }
+    @media (max-width: 700px) { .group-grid .sk-img { aspect-ratio: 16/10; } }
     .sk-line { height: 16px; margin-bottom: 8px; width: 70%; }
     .sk-line.short { width: 40%; }
 
@@ -480,6 +558,7 @@
     .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 48px; margin-bottom: 54px; }
     .footer-logo { font-family: var(--serif); font-size: clamp(23px, 6vw, 30px); letter-spacing: clamp(5px, 1.9vw, 10px); margin-bottom: 14px; }
     .footer-tag { font-size: 13.5px; color: #b7ada0; max-width: 320px; line-height: 1.7; }
+    #footer-groups { display: contents; }
     .footer-h { font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #b7ada0; margin-bottom: 16px; }
     .footer-col a, .footer-col button {
       display: block; background: none; border: none; color: var(--cream); font-size: 14px;
@@ -744,9 +823,7 @@
       <span class="catalog-count" id="home-cat-count"></span>
     </div>
     <div id="categories-container">
-      <div class="cat-grid">
-        <div><div class="sk sk-img"></div></div>
-        <div><div class="sk sk-img"></div></div>
+      <div class="group-grid">
         <div><div class="sk sk-img"></div></div>
         <div><div class="sk sk-img"></div></div>
       </div>
@@ -789,6 +866,28 @@
   </section>
 </div>
 
+<!-- ── GRUPO (ARTESANÍAS / ROPAS) ─────────────────────────── -->
+<!-- El nivel intermedio: la portada lleva acá, y acá se ven las
+     categorías del grupo (arriba) y todas sus piezas (abajo). -->
+<div id="page-group" class="page">
+  <section class="catalog">
+    <button class="back-link" onclick="showPage('home')">← Volver al inicio</button>
+    <div class="catalog-head">
+      <h2 class="catalog-title" id="group-title">Artesanías</h2>
+      <span class="catalog-count" id="group-count"></span>
+    </div>
+    <p class="group-lead" id="group-lead"></p>
+    <div id="group-categories"></div>
+    <div class="group-pieces">
+      <div class="catalog-head">
+        <h2 class="catalog-title" id="group-pieces-title">Todas las piezas</h2>
+        <span class="catalog-count" id="group-pieces-count"></span>
+      </div>
+      <div id="group-products"></div>
+    </div>
+  </section>
+</div>
+
 <!-- ── CATEGORÍA / LISTADO DE PRODUCTOS ───────────────────── -->
 <!-- Una sola pantalla sirve para los tres listados: una categoría
      puntual (/categoria/:slug), todas las piezas (/coleccion) y los
@@ -796,7 +895,7 @@
      estructura. -->
 <div id="page-category" class="page">
   <section class="catalog">
-    <button class="back-link" onclick="showPage('home')">← Volver a las categorías</button>
+    <button class="back-link" id="category-back" onclick="showPage('home')">← Volver a las categorías</button>
     <div class="catalog-head">
       <h2 class="catalog-title" id="catalog-title">La colección</h2>
       <span class="catalog-count" id="catalog-count"></span>
@@ -844,7 +943,9 @@
       </div>
       <div class="footer-col">
         <div class="footer-h">Tienda</div>
-        <button onclick="showPage('home')">Categorías</button>
+        <!-- Los dos grupos se inyectan acá desde los datos, para no
+             repetir en el HTML el reparto que define api/_groups.js -->
+        <span id="footer-groups"></span>
         <button onclick="showAll()">Todas las piezas</button>
         <button onclick="showPage('cart')">Carrito</button>
       </div>
@@ -892,8 +993,13 @@ const CONFIG = {
 /* ── 2. ESTADO GLOBAL ─────────────────────────────────────── */
 let products = [];
 let categories = [];
+let groups = [];            // los dos de la portada: artesanias / ropas
 let cart = [];              // items: { ...producto, qty, size }
 let currentFilter = 'all';
+// Grupo en el que está parado el visitante (null fuera de uno: en
+// "todas las piezas", en una búsqueda o en el carrito). Define qué
+// categorías muestra la tira de arriba y adónde vuelve el "atrás".
+let currentGroup = null;
 let detailQty = 1;
 let detailSize = null;
 let currentDetailStock = null;
@@ -929,6 +1035,21 @@ function toast(msg) {
 
 function catName(slug) {
   return categories.find(c => c.slug === slug)?.name || '';
+}
+
+/* ── Grupos (ARTESANÍAS / ROPAS) ──────────────────────────────
+   El reparto de las 13 categorías entre los dos grupos NO se
+   define acá: viene resuelto desde /api/notion (cada categoría
+   trae su campo "group"). El único lugar donde se toca es
+   api/_groups.js. */
+function findGroup(slug)     { return groups.find(g => g.slug === slug) || null; }
+function groupOfCat(slug)    { return categories.find(c => c.slug === slug)?.group || null; }
+function catsOfGroup(slug)   { return categories.filter(c => c.group === slug); }
+function productsOfGroup(slug) {
+  const inGroup = new Set(catsOfGroup(slug).map(c => c.slug));
+  // Una pieza sin categoría no cae en ningún grupo: se la ve en
+  // "todas las piezas" y en el buscador, no acá.
+  return products.filter(p => p.category && inGroup.has(p.category));
 }
 
 function scrollToCatalog() {
@@ -970,6 +1091,17 @@ function setMeta({ title, description, ogImage, url }) {
   document.querySelector('link[rel="canonical"]')?.setAttribute('href', url);
 }
 function updateMetaForPage(page, id) {
+  if (page === 'group') {
+    const g = findGroup(id);
+    if (!g) return setMeta(DEFAULT_META);
+    setMeta({
+      title: `${g.name} | SOLAR GUARANI — Moda y Artesanía Paraguaya`,
+      description: `${g.name} en SOLAR GUARANI. ${g.tagline} Envíos a todo el país, pedidos por WhatsApp.`,
+      ogImage: g.cover || DEFAULT_META.ogImage,
+      url: CONFIG.baseUrl + '/' + g.slug,
+    });
+    return;
+  }
   if (page === 'category') {
     const c = categories.find(x => x.slug === id);
     if (!c) {
@@ -1005,6 +1137,8 @@ function updateMetaForPage(page, id) {
 /*
  * urlForPage() — la URL que le corresponde a cada pantalla.
  *   home      → /
+ *   group     → /artesanias  |  /ropas     (URL limpia, sin prefijo:
+ *               son las dos puertas de entrada de la tienda)
  *   category  → /categoria/:slug   (o /coleccion si es "todas")
  *   product   → /producto/:slug
  * El carrito y el checkout no tienen URL propia: son pasos, no
@@ -1012,13 +1146,15 @@ function updateMetaForPage(page, id) {
  */
 function urlForPage(page, id) {
   if (page === 'product')  return urlForProduct(id);
+  if (page === 'group')    return id ? `/${id}` : '/';
   if (page === 'category') return (id && id !== 'all') ? `/categoria/${id}` : '/coleccion';
   if (page === 'home')     return '/';
   return null;
 }
 
 /*
- * showPage(page, id) — page: home | category | product | cart | checkout
+ * showPage(page, id) — page: home | group | category | product | cart | checkout
+ *   · en 'group', id es 'artesanias' o 'ropas'
  *   · en 'category', id es el slug ('all' = todas las piezas)
  *   · fromHistory=true cuando lo dispara el ruteo (popstate o la
  *     carga inicial), para no volver a apilar la misma URL
@@ -1029,15 +1165,29 @@ function showPage(page, id, fromHistory) {
   if (page === 'home') resetSearch();
 
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  // La tira de categorías solo aparece cuando se están mirando piezas:
-  // en la portada la lista de categorías YA es el contenido principal.
+  // La tira de categorías solo aparece de la página de grupo para
+  // abajo: en la portada el contenido son los dos grupos, y una tira
+  // de categorías ahí sería un atajo que se salta el nivel entero.
   document.getElementById('cat-nav').style.display =
-    (page === 'category' || page === 'product') ? '' : 'none';
+    (page === 'group' || page === 'category' || page === 'product') ? '' : 'none';
   document.getElementById('page-' + page).classList.add('active');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 
-  if (page === 'category') { currentFilter = id || 'all'; renderCategories(); renderProducts(); }
-  if (page === 'product')  renderProductDetail(id);
+  // currentGroup: en qué mitad de la tienda está parado el visitante.
+  // Se deduce de la categoría cuando la pantalla no es la del grupo.
+  if (page === 'group')    currentGroup = id;
+  if (page === 'category') currentGroup = (id && id !== 'all') ? groupOfCat(id) : null;
+  if (page === 'product') {
+    const prod = products.find(x => x.id === id);
+    currentGroup = prod?.category ? groupOfCat(prod.category) : null;
+  }
+
+  if (page === 'group')    { renderCategories('group'); renderGroupPage(id); }
+  if (page === 'category') { currentFilter = id || 'all'; renderCategories(currentFilter); renderProducts(); }
+  if (page === 'product')  {
+    renderCategories(products.find(x => x.id === id)?.category || null);
+    renderProductDetail(id);
+  }
   if (page === 'cart')     renderCart();
   if (page === 'checkout') renderCheckout();
 
@@ -1048,6 +1198,7 @@ function showPage(page, id, fromHistory) {
   updateMetaForPage(page, id);
 }
 
+function goGroup(slug)    { showPage('group', slug); }
 function goCategory(slug) { showPage('category', slug); }
 function showAll()        { showPage('category', 'all'); }
 
@@ -1069,6 +1220,11 @@ function routeFromUrl() {
     return showPage('category', 'all', true);
   } else if (path === '/') {
     return showPage('home', null, true);
+  } else if (groups.some(g => g.slug === path.slice(1))) {
+    // Las páginas de grupo cuelgan de la raíz (/artesanias, /ropas),
+    // así que se resuelven por último: cualquier otra ruta con una
+    // sola barra ya quedó descartada arriba.
+    return showPage('group', path.slice(1), true);
   }
 
   // URL que no existe (categoría borrada, producto dado de baja):
@@ -1126,71 +1282,158 @@ function toggleSearch() {
   else clearSearch();
 }
 
-/* ── 6. CATEGORÍAS Y CATÁLOGO ─────────────────────────────── */
-function renderCategories() {
-  // Tira superior (solo visible dentro del listado y del detalle)
-  const nav = document.getElementById('cat-nav-inner');
-  nav.innerHTML =
-    `<button class="cat-link ${currentFilter === 'all' ? 'active' : ''}" onclick="showAll()">Todo</button>` +
-    categories.map(c =>
-      `<button class="cat-link ${currentFilter === c.slug ? 'active' : ''}" onclick="goCategory('${c.slug}')">${escapeHtml(c.name)}</button>`
-    ).join('');
+/* ── 6. GRUPOS, CATEGORÍAS Y CATÁLOGO ─────────────────────── */
 
-  // Que la pestaña activa se vea sin tener que arrastrar la tira
-  // (con 13 categorías no entran todas en pantalla).
+/*
+ * renderCategories(active) — la tira de arriba.
+ * Ya no lista las 13 categorías de toda la tienda: lista las del
+ * grupo en el que estás, con el nombre del grupo como primera
+ * pestaña (que además es el camino de vuelta). Con 7 y 6 la tira
+ * entra en pantalla; con las 13 juntas era un cajón de sastre que
+ * mezclaba una hamaca con una chomba.
+ * Fuera de un grupo —todas las piezas, una búsqueda, una pieza sin
+ * categoría— vuelve a ser "Todo" + las 13.
+ *   active: 'group' | slug de categoría | 'all' | null
+ */
+function renderCategories(active) {
+  const nav  = document.getElementById('cat-nav-inner');
+  const g    = currentGroup ? findGroup(currentGroup) : null;
+  const cats = g ? catsOfGroup(g.slug) : categories;
+
+  const head = g
+    ? `<button class="cat-link ${active === 'group' ? 'active' : ''}" onclick="goGroup('${g.slug}')">${escapeHtml(g.name)}</button>`
+    : `<button class="cat-link ${active === 'all' ? 'active' : ''}" onclick="showAll()">Todo</button>`;
+
+  nav.innerHTML = head + cats.map(c =>
+    `<button class="cat-link ${active === c.slug ? 'active' : ''}" onclick="goCategory('${c.slug}')">${escapeHtml(c.name)}</button>`
+  ).join('');
+
+  // Que la pestaña activa se vea sin tener que arrastrar la tira.
   const activa = nav.querySelector('.cat-link.active');
   if (activa) {
     const barra = document.getElementById('cat-nav');
     barra.scrollLeft = activa.offsetLeft - (barra.clientWidth - activa.offsetWidth) / 2;
   }
-
-  renderCategoryGrid();
 }
 
 /*
- * renderCategoryGrid() — la portada. Se muestran TODAS las categorías,
- * también las que todavía no tienen piezas: son la estructura de la
- * tienda, no un listado de stock. Las vacías van marcadas
- * "Próximamente" y su página avisa lo mismo.
- * La portada de cada tarjeta es la foto del primer producto de esa
- * categoría (la calcula api/notion.js); si no hay, queda la inicial.
+ * renderGroupGrid() — LA PORTADA. Dos bloques y nada más:
+ * ARTESANÍAS y ROPAS. Las categorías quedan un nivel más abajo.
+ * Se muestran siempre los dos, tengan piezas o no: son la puerta de
+ * entrada a la tienda, no un listado de stock. La foto de portada es
+ * la primera pieza con foto del grupo (la calcula api/notion.js).
  */
-function renderCategoryGrid() {
+function renderGroupGrid() {
   const wrap  = document.getElementById('categories-container');
   const count = document.getElementById('home-cat-count');
 
-  if (!categories.length) {
+  if (!groups.length) {
     count.textContent = '';
     wrap.innerHTML = `<div class="empty-msg">
-      <div class="big">Todavía no hay categorías</div>
-      <p>Estamos preparando la colección. Volvé en unos días.</p>
+      <div class="big">Todavía no hay colección</div>
+      <p>Estamos preparando la tienda. Volvé en unos días.</p>
     </div>`;
     return;
   }
 
-  count.textContent = `${categories.length} categoría${categories.length === 1 ? '' : 's'}`;
+  count.textContent = products.length
+    ? `${products.length} pieza${products.length === 1 ? '' : 's'}`
+    : '';
 
-  const cards = categories.map(c => {
-    const n = c.count || 0;
-    const cover = c.cover
-      ? `<img src="${escapeHtml(c.cover)}" alt="${escapeHtml(c.name)}" loading="lazy">`
-      : `<div class="cat-card-init">${escapeHtml(c.name.trim().charAt(0).toUpperCase())}</div>`;
+  const cards = groups.map(g => {
+    const cover = g.cover
+      ? `<img src="${escapeHtml(g.cover)}" alt="${escapeHtml(g.name)}" loading="lazy">`
+      : `<div class="cat-card-init">${escapeHtml(g.name.trim().charAt(0).toUpperCase())}</div>`;
+    const pie = g.count
+      ? `${g.count} pieza${g.count === 1 ? '' : 's'} · ${g.catCount} categoría${g.catCount === 1 ? '' : 's'}`
+      : 'Próximamente';
     return `
-      <button class="cat-card${n ? '' : ' is-empty'}" onclick="goCategory('${c.slug}')" aria-label="Ver ${escapeHtml(c.name)}">
+      <button class="cat-card${g.count ? '' : ' is-empty'}" onclick="goGroup('${g.slug}')" aria-label="Ver ${escapeHtml(g.name)}">
         <div class="cat-card-img">${cover}</div>
         <div class="cat-card-body">
-          <div class="cat-card-name">${escapeHtml(c.name)}</div>
-          <div class="cat-card-count">${n ? `${n} pieza${n === 1 ? '' : 's'}` : 'Próximamente'}</div>
+          <div class="group-card-name">${escapeHtml(g.name)}</div>
+          <div class="group-card-tag">${escapeHtml(g.tagline)}</div>
+          <div class="group-card-count">${pie}</div>
         </div>
       </button>`;
   }).join('');
 
-  // El "ver todo" solo tiene sentido si hay algo que ver
   const foot = products.length
     ? `<div class="cat-grid-foot"><button class="btn ghost" onclick="showAll()">Ver todas las piezas</button></div>`
     : '';
 
-  wrap.innerHTML = `<div class="cat-grid">${cards}</div>${foot}`;
+  wrap.innerHTML = `<div class="group-grid">${cards}</div>${foot}`;
+}
+
+/* Los dos grupos también en el footer, desde los mismos datos. */
+function renderFooterGroups() {
+  document.getElementById('footer-groups').innerHTML = groups.map(g =>
+    `<button onclick="goGroup('${g.slug}')">${escapeHtml(g.name)}</button>`
+  ).join('');
+}
+
+/*
+ * catCardHtml(c) — tarjeta de categoría. Se usa dentro de la página
+ * de grupo (la portada ya no las muestra). Las categorías sin piezas
+ * se muestran igual, marcadas "Próximamente": son la estructura de
+ * la tienda, no un listado de stock.
+ */
+function catCardHtml(c) {
+  const n = c.count || 0;
+  const cover = c.cover
+    ? `<img src="${escapeHtml(c.cover)}" alt="${escapeHtml(c.name)}" loading="lazy">`
+    : `<div class="cat-card-init">${escapeHtml(c.name.trim().charAt(0).toUpperCase())}</div>`;
+  return `
+    <button class="cat-card${n ? '' : ' is-empty'}" onclick="goCategory('${c.slug}')" aria-label="Ver ${escapeHtml(c.name)}">
+      <div class="cat-card-img">${cover}</div>
+      <div class="cat-card-body">
+        <div class="cat-card-name">${escapeHtml(c.name)}</div>
+        <div class="cat-card-count">${n ? `${n} pieza${n === 1 ? '' : 's'}` : 'Próximamente'}</div>
+      </div>
+    </button>`;
+}
+
+/*
+ * renderGroupPage(slug) — el nivel intermedio: arriba las categorías
+ * del grupo, abajo TODAS sus piezas juntas.
+ * Van las dos cosas y no solo las categorías porque hoy 11 de las 13
+ * están vacías: una página que fuera nada más que tarjetas
+ * "Próximamente" no le mostraría al visitante nada que pueda comprar.
+ */
+function renderGroupPage(slug) {
+  const g = findGroup(slug);
+  if (!g) return;
+
+  const cats = catsOfGroup(slug);
+  const list = productsOfGroup(slug)
+    .sort((a, b) => (b.destacado === true) - (a.destacado === true));
+
+  document.getElementById('group-title').textContent = g.name;
+  document.getElementById('group-lead').textContent  = g.tagline;
+  document.getElementById('group-count').textContent = cats.length
+    ? `${cats.length} categoría${cats.length === 1 ? '' : 's'}`
+    : '';
+
+  document.getElementById('group-categories').innerHTML =
+    `<div class="cat-grid">${cats.map(catCardHtml).join('')}</div>`;
+
+  const pieces = document.querySelector('#page-group .group-pieces');
+  const wrap   = document.getElementById('group-products');
+
+  // Sin piezas en todo el grupo, el bloque de abajo sobra: las
+  // tarjetas de categoría ya dicen "Próximamente" y repetirlo en un
+  // segundo vacío solo hace la página más larga y más triste.
+  if (!list.length) { pieces.style.display = 'none'; wrap.innerHTML = ''; return; }
+  pieces.style.display = '';
+
+  document.getElementById('group-pieces-title').textContent = `Todas las piezas de ${g.noun}`;
+  document.getElementById('group-pieces-count').textContent =
+    `${list.length} pieza${list.length === 1 ? '' : 's'}`;
+
+  // showCat: dentro del grupo se mezclan varias categorías, así que
+  // el rótulo de cada tarjeta sí aporta (a diferencia del listado de
+  // una categoría sola, donde repetiría el título de la página).
+  wrap.innerHTML = `<div class="grid">${list.map(p => productCardHtml(p, true)).join('')}</div>`;
 }
 
 function getVisibleProducts() {
@@ -1208,9 +1451,45 @@ function getVisibleProducts() {
   return [...list].sort((a, b) => (b.destacado === true) - (a.destacado === true));
 }
 
+/*
+ * productCardHtml(p, showCat) — la tarjeta de una pieza. La usan el
+ * listado (/categoria/:slug, /coleccion, búsqueda) y la página de
+ * grupo. showCat: mostrar o no el rótulo de la categoría, que solo
+ * aporta donde se mezclan categorías.
+ */
+function productCardHtml(p, showCat) {
+  const imgA = p.img
+    ? `<img class="card-img-a" src="${escapeHtml(p.img)}" alt="${escapeHtml(p.name)}" loading="lazy">`
+    : `<div class="card-noimg">SG</div>`;
+  const imgB = p.imgs && p.imgs[1]
+    ? `<img class="card-img-b" src="${escapeHtml(p.imgs[1])}" alt="" loading="lazy">`
+    : '';
+  const price = p.priceOld
+    ? `<span class="price-old">${fmt(p.priceOld)}</span>${fmt(p.price)}`
+    : fmt(p.price);
+  return `
+    <article class="card" onclick="showPage('product', '${p.id}')">
+      <div class="card-img-wrap">
+        ${imgA}${imgB}
+        ${p.badge ? `<span class="card-badge">${escapeHtml(p.badge)}</span>` : ''}
+      </div>
+      ${showCat && p.category ? `<div class="card-cat">${escapeHtml(catName(p.category))}</div>` : ''}
+      <h3 class="card-name">${escapeHtml(p.name)}</h3>
+      <div class="card-price">${price}</div>
+      ${stockTag(p.stock)}
+    </article>`;
+}
+
 function renderProducts() {
   const wrap = document.getElementById('products-container');
   const list = getVisibleProducts();
+
+  // El "volver" apunta al grupo del que se llegó (Artesanías o Ropas),
+  // no a la portada: es un paso para atrás, no dos.
+  const grupo = currentGroup ? findGroup(currentGroup) : null;
+  const back  = document.getElementById('category-back');
+  back.textContent = grupo ? `← Volver a ${grupo.name}` : '← Volver al inicio';
+  back.onclick     = grupo ? () => goGroup(grupo.slug) : () => showPage('home');
 
   const scope = currentFilter === 'all' ? 'Todas las piezas' : catName(currentFilter);
   document.getElementById('catalog-title').textContent =
@@ -1231,7 +1510,9 @@ function renderProducts() {
           <div class="big">Todavía no hay piezas acá</div>
           <p>Estamos tejiendo${scope && currentFilter !== 'all' ? ` la colección de ${escapeHtml(scope.toLowerCase())}` : ''}.
              Escribinos por WhatsApp y te avisamos cuando lleguen.</p>
-          <button class="btn ghost" onclick="showPage('home')" style="margin-top:22px">Ver otras categorías</button>
+          <button class="btn ghost" onclick="${grupo ? `goGroup('${grupo.slug}')` : `showPage('home')`}" style="margin-top:22px">
+            Ver ${grupo ? `las otras de ${escapeHtml(grupo.name.toLowerCase())}` : 'otras categorías'}
+          </button>
         </div>`;
     return;
   }
@@ -1241,28 +1522,7 @@ function renderProducts() {
   // categorías (todas las piezas y resultados de búsqueda).
   const showCat = currentFilter === 'all' || !!searchQuery;
 
-  wrap.innerHTML = `<div class="grid">` + list.map(p => {
-    const imgA = p.img
-      ? `<img class="card-img-a" src="${escapeHtml(p.img)}" alt="${escapeHtml(p.name)}" loading="lazy">`
-      : `<div class="card-noimg">SG</div>`;
-    const imgB = p.imgs && p.imgs[1]
-      ? `<img class="card-img-b" src="${escapeHtml(p.imgs[1])}" alt="" loading="lazy">`
-      : '';
-    const price = p.priceOld
-      ? `<span class="price-old">${fmt(p.priceOld)}</span>${fmt(p.price)}`
-      : fmt(p.price);
-    return `
-      <article class="card" onclick="showPage('product', '${p.id}')">
-        <div class="card-img-wrap">
-          ${imgA}${imgB}
-          ${p.badge ? `<span class="card-badge">${escapeHtml(p.badge)}</span>` : ''}
-        </div>
-        ${showCat && p.category ? `<div class="card-cat">${escapeHtml(catName(p.category))}</div>` : ''}
-        <h3 class="card-name">${escapeHtml(p.name)}</h3>
-        <div class="card-price">${price}</div>
-        ${stockTag(p.stock)}
-      </article>`;
-  }).join('') + `</div>`;
+  wrap.innerHTML = `<div class="grid">${list.map(p => productCardHtml(p, showCat)).join('')}</div>`;
 }
 
 /* ── 7. DETALLE DE PRODUCTO ───────────────────────────────── */
@@ -1506,9 +1766,12 @@ async function loadData() {
     const res = await fetch(CONFIG.notionProxy);
     if (!res.ok) throw new Error('Error al cargar datos');
     const data = await res.json();
+    groups     = data.groups     || [];
     categories = data.categories || [];
     products   = data.products   || [];
-    renderCategories();
+    renderGroupGrid();
+    renderFooterGroups();
+    renderCategories('all');
     renderProducts();
   } catch (err) {
     console.error(err);

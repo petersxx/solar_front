@@ -21,19 +21,16 @@
 // ── ID de la base de datos única en Notion ──────────────────
 const PROD_DB = '3a4459f1-13f9-81c8-b440-f1ebd658da27'; // Base "Productos" (SOLAR GUARANI)
 
+// Los dos grupos de la portada (ARTESANÍAS / ROPAS) y el reparto de
+// las categorías entre ellos. Único lugar donde se define: ver
+// api/_groups.js.
+const { GROUPS, groupOf, slugify } = require('./_groups');
+
 const HEADERS = () => ({
   'Authorization': `Bearer ${process.env.NOTION_TOKEN}`,
   'Notion-Version': '2022-06-28',
   'Content-Type': 'application/json',
 });
-
-function slugify(str) {
-  return String(str)
-    .toLowerCase()
-    .normalize('NFD').replace(/[̀-ͯ]/g, '')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-}
 
 /*
  * notionQuery(body) — consulta la base de Productos juntando
@@ -115,6 +112,7 @@ module.exports = async function handler(req, res) {
     // igual, marcadas como "Próximamente".
     //   count → productos disponibles en esa categoría
     //   cover → foto del primer producto que tenga, para la portada
+    //   group → a cuál de los dos grupos pertenece (ver _groups.js)
     const options = schema.properties?.['Categoría']?.select?.options || [];
     const categories = options.map(o => {
       const slug = slugify(o.name);
@@ -125,12 +123,36 @@ module.exports = async function handler(req, res) {
         slug,
         count: inCat.length,
         cover: inCat.find(p => p.img)?.img || null,
+        group: groupOf(slug),
+      };
+    });
+
+    // ── Grupos ───────────────────────────────────────────────
+    // Los dos bloques de la portada. Se devuelven SIEMPRE los dos,
+    // tengan piezas o no: son la puerta de entrada a la tienda, no
+    // un listado de stock. Igual que con las categorías, la foto de
+    // portada sale del propio catálogo (la primera pieza con foto
+    // del grupo), porque en Notion no hay dónde guardarla.
+    //   count    → piezas disponibles en todo el grupo
+    //   catCount → categorías del grupo que ya tienen piezas
+    const groups = GROUPS.map(g => {
+      const cats  = categories.filter(c => c.group === g.slug);
+      const count = cats.reduce((n, c) => n + c.count, 0);
+      return {
+        slug: g.slug,
+        name: g.name,
+        noun: g.noun,
+        tagline: g.tagline,
+        cats: cats.map(c => c.slug),
+        count,
+        catCount: cats.filter(c => c.count > 0).length,
+        cover: cats.find(c => c.cover)?.cover || null,
       };
     });
 
     // Caché de 10s en el edge de Vercel (+50s stale-while-revalidate)
     res.setHeader('Cache-Control', 's-maxage=10, stale-while-revalidate=50');
-    res.json({ categories, products });
+    res.json({ groups, categories, products });
 
   } catch (err) {
     console.error(err);
