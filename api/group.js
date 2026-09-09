@@ -94,10 +94,12 @@ module.exports = async function handler(req, res) {
     }
 
     const url   = `${BASE_URL}/${group.slug}`;
-    const title = `${group.name} | SOLAR GUARANI — Moda y Artesanía Paraguaya`;
+    // Para el buscador vale el nombre de catálogo, no el de marca
+    const seo = group.seoName || group.name;
+    const title = `${seo} | SOLAR GUARANI — Moda y Artesanía Paraguaya`;
     const description = inGroup.length
-      ? `${group.name}: ${inGroup.length} pieza${inGroup.length === 1 ? '' : 's'} hecha${inGroup.length === 1 ? '' : 's'} a mano en Paraguay. ${group.tagline} Envíos a todo el país, pedidos por WhatsApp.`
-      : `${group.name} en SOLAR GUARANI. ${group.tagline} Envíos a todo el país, pedidos por WhatsApp.`;
+      ? `${seo}: ${inGroup.length} pieza${inGroup.length === 1 ? '' : 's'} hecha${inGroup.length === 1 ? '' : 's'} a mano en Paraguay. ${group.tagline} Envíos a todo el país, pedidos por WhatsApp.`
+      : `${seo} en SOLAR GUARANI. ${group.tagline} Envíos a todo el país, pedidos por WhatsApp.`;
 
     let html = baseHtml.replace(/<title>[^<]*<\/title>/, `<title>${escapeHtml(title)}</title>`);
     html = replaceMetaContent(html, 'name', 'description', description);

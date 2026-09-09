@@ -1113,8 +1113,8 @@ function updateMetaForPage(page, id) {
     const g = findGroup(id);
     if (!g) return setMeta(DEFAULT_META);
     setMeta({
-      title: `${g.name} | SOLAR GUARANI — Moda y Artesanía Paraguaya`,
-      description: `${g.name} en SOLAR GUARANI. ${g.tagline} Envíos a todo el país, pedidos por WhatsApp.`,
+      title: `${g.seoName || g.name} | SOLAR GUARANI — Moda y Artesanía Paraguaya`,
+      description: `${g.seoName || g.name} en SOLAR GUARANI. ${g.tagline} Envíos a todo el país, pedidos por WhatsApp.`,
       ogImage: g.cover || DEFAULT_META.ogImage,
       url: CONFIG.baseUrl + '/' + g.slug,
     });
@@ -1414,6 +1414,7 @@ function renderGroupGrid() {
  */
 const VUELTAS_SCROLL = 1.25;   // vueltas completas de punta a punta
 const MARGEN_MODELO  = 1.04;   // >1: la figura desborda un poco el cuadro
+const MARGEN_APAISADO = 1.25;  // ídem, en la tarjeta apaisada del celular
 const SUBIR_MODELO   = 0.08;   // fracción del alto que se sube la figura
 let modelosActivos = [];
 
@@ -1549,7 +1550,17 @@ async function arrancarModelo(canvas) {
      Se recalcula en cada cambio de tamaño porque la tarjeta es
      vertical en escritorio y apaisada en celular. */
   function encuadrar(aspecto) {
-    const porAlto  = (medida.y / MARGEN_MODELO / 2) / tanFov;
+    // La figura es vertical. En la tarjeta VERTICAL del escritorio
+    // llena sola; en la APAISADA del celular entra sobrada de alto y
+    // deja negro a los costados, así que al lado de la tarjeta de
+    // Artesanías —que es una foto a sangre— se ve chica y vacía
+    // aunque las dos cajas midan exactamente lo mismo. Ahí se la
+    // deja desbordar bastante más de alto: es lo mismo que hace
+    // object-fit:cover con una foto, recortar para llenar.
+    const margen = aspecto > 1 ? MARGEN_APAISADO : MARGEN_MODELO;
+    const porAlto  = (medida.y / margen / 2) / tanFov;
+    // El ancho nunca se recorta: si la figura se saliera de costado
+    // se le cortarían los brazos al girar.
     const porAncho = (anchoAlGirar / MARGEN_MODELO / 2) / (tanFov * aspecto);
     camera.position.set(0, 0, Math.max(porAlto, porAncho));
     camera.lookAt(0, 0, 0);

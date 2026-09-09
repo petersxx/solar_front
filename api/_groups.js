@@ -28,6 +28,12 @@
  *  PARA AGREGAR UN GRUPO NUEVO: sumarlo acá y agregar su rewrite
  *  en vercel.json y en dev-server.js (las URLs son limpias,
  *  /artesanias y /ropas, así que cada grupo necesita la suya).
+ *
+ *  OJO: "slug" es la URL y "name" es lo que se muestra; no tienen
+ *  por qué coincidir. El grupo de ropa se llama "Vestí con Solar"
+ *  en pantalla pero vive en /ropas, que es la palabra que la gente
+ *  busca y el link que ya está publicado e indexado. Cambiar un
+ *  slug rompe las URLs que anden dando vuelta.
  * ============================================================
  */
 
@@ -57,7 +63,12 @@ const GROUPS = [
   },
   {
     slug: 'ropas',
-    name: 'Ropas',
+    name: 'Vestí con Solar',
+    // seoName: el nombre "de catálogo", solo para el <title> y las
+    // meta tags. El nombre de marca no sirve para que a este grupo
+    // lo encuentren en Google: nadie busca "vestí con solar", buscan
+    // "ropa paraguaya". El visitante ve name; el buscador, seoName.
+    seoName: 'Ropa',
     noun: 'ropa',
     // Modelo 3D de la tarjeta de la portada, que rota con el scroll.
     // Si está, reemplaza a la foto de portada calculada del catálogo.

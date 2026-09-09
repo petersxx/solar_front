@@ -141,6 +141,7 @@ module.exports = async function handler(req, res) {
       return {
         slug: g.slug,
         name: g.name,
+        seoName: g.seoName || g.name,
         noun: g.noun,
         tagline: g.tagline,
         model: g.model || null,
