@@ -463,13 +463,19 @@
     .cat-card.has-model .cat-card-init { transition: opacity .5s ease; }
     .cat-card.has-model.model-on .cat-card-init { opacity: 0; }
 
-    /* Breakpoint propio: dos tarjetas de 3/4 lado a lado se vuelven
+    /* Breakpoint propio: dos tarjetas de 4/5 lado a lado se vuelven
        dos torres angostas antes de que el celular las apile por el
-       breakpoint general. Abajo de 700px van una debajo de la otra,
-       apaisadas, para que las dos entren en la primera pantalla. */
+       breakpoint general. Abajo de 700px van una debajo de la otra
+       y CUADRADAS: son las dos puertas de entrada de la tienda y en
+       apaisado quedaban chicas. Al cuadrado también le viene mejor
+       el modelo 3D, que es una figura vertical. */
     @media (max-width: 700px) {
-      .group-grid { grid-template-columns: 1fr; gap: 18px; }
-      .group-grid .cat-card-img  { aspect-ratio: 16 / 10; }
+      /* El tope de ancho es para el tramo de arriba del rango (tablet
+         chica, celular acostado): sin él, en 700px la tarjeta sale de
+         668x668 y se come la pantalla entera. En un celular normal no
+         llega a aplicar y las tarjetas van a todo el ancho. */
+      .group-grid { grid-template-columns: 1fr; gap: 18px; max-width: 460px; }
+      .group-grid .cat-card-img  { aspect-ratio: 1 / 1; }
       .group-grid .cat-card-body { padding: 22px 20px 20px; }
       .group-card-tag   { font-size: 12.5px; margin-top: 8px; }
       .group-card-count { margin-top: 10px; }
@@ -492,7 +498,7 @@
     @keyframes pulse { 0%,100% { opacity: .55; } 50% { opacity: 1; } }
     .sk-img { aspect-ratio: 4/5; margin-bottom: 16px; }
     .group-grid .sk-img { aspect-ratio: 4/5; }
-    @media (max-width: 700px) { .group-grid .sk-img { aspect-ratio: 16/10; } }
+    @media (max-width: 700px) { .group-grid .sk-img { aspect-ratio: 1/1; } }
     .sk-line { height: 16px; margin-bottom: 8px; width: 70%; }
     .sk-line.short { width: 40%; }
 
@@ -1414,7 +1420,6 @@ function renderGroupGrid() {
  */
 const VUELTAS_SCROLL = 1.25;   // vueltas completas de punta a punta
 const MARGEN_MODELO  = 1.04;   // >1: la figura desborda un poco el cuadro
-const MARGEN_APAISADO = 1.25;  // ídem, en la tarjeta apaisada del celular
 const SUBIR_MODELO   = 0.08;   // fracción del alto que se sube la figura
 let modelosActivos = [];
 
@@ -1550,15 +1555,7 @@ async function arrancarModelo(canvas) {
      Se recalcula en cada cambio de tamaño porque la tarjeta es
      vertical en escritorio y apaisada en celular. */
   function encuadrar(aspecto) {
-    // La figura es vertical. En la tarjeta VERTICAL del escritorio
-    // llena sola; en la APAISADA del celular entra sobrada de alto y
-    // deja negro a los costados, así que al lado de la tarjeta de
-    // Artesanías —que es una foto a sangre— se ve chica y vacía
-    // aunque las dos cajas midan exactamente lo mismo. Ahí se la
-    // deja desbordar bastante más de alto: es lo mismo que hace
-    // object-fit:cover con una foto, recortar para llenar.
-    const margen = aspecto > 1 ? MARGEN_APAISADO : MARGEN_MODELO;
-    const porAlto  = (medida.y / margen / 2) / tanFov;
+    const porAlto  = (medida.y / MARGEN_MODELO / 2) / tanFov;
     // El ancho nunca se recorta: si la figura se saliera de costado
     // se le cortarían los brazos al girar.
     const porAncho = (anchoAlGirar / MARGEN_MODELO / 2) / (tanFov * aspecto);
