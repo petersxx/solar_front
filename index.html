@@ -332,15 +332,11 @@
     .empty-msg { text-align: center; padding: 90px 20px; color: var(--ink-soft); }
     .empty-msg .big { font-family: var(--serif); font-size: 26px; font-style: italic; margin-bottom: 10px; color: var(--ink); }
 
-    /* ── CATEGORY GRID (portada) ─────────────────────────
-       La home ya no lista productos: lista categorías. Cada
-       tarjeta usa como portada la foto del primer producto de
-       esa categoría; si todavía no hay ninguno queda el fondo
-       arena con la inicial, y el pie dice "Próximamente". */
-    .cat-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 30px 24px;
-    }
+    /* ── TARJETA DE GRUPO ────────────────────────────────
+       La usa la portada para ARTESANÍAS y ROPAS (ver .group-grid,
+       más abajo, que es quien las acomoda). Ya no hay tarjetas de
+       categoría en ningún lado: dentro de un grupo se ven las
+       piezas y las categorías viven en la tira de arriba. */
     .cat-card {
       position: relative; display: block; width: 100%; padding: 0; margin: 0;
       border: none; background: none; color: inherit; font-family: inherit;
@@ -363,23 +359,13 @@
       font-family: var(--serif); font-style: italic; font-size: 52px; color: #b9ae97;
     }
     .cat-card-body { position: absolute; left: 0; right: 0; bottom: 0; padding: 22px 22px 20px; }
-    .cat-card-name {
-      font-family: var(--serif); font-size: clamp(21px, 2.3vw, 26px); font-weight: 600;
-      line-height: 1.2; color: var(--cream);
-    }
-    .cat-card-count {
-      margin-top: 7px; font-size: 10.5px; font-weight: 700; letter-spacing: 2px;
-      text-transform: uppercase; color: rgba(246, 243, 236, .78);
-    }
     /* Sin foto no hay nada que oscurecer: el velo sobre el fondo arena
        solo ensucia. La tarjeta vacía queda clara, con el texto en tinta
        y un filete que la sostiene como pieza del mismo sistema. */
     .cat-card.is-empty .cat-card-img { border: 1px solid #ddd4c2; }
     .cat-card.is-empty .cat-card-img::after { display: none; }
-    .cat-card.is-empty .cat-card-name  { color: var(--ink); }
-    .cat-card.is-empty .cat-card-count { color: var(--ink-soft); }
 
-    /* "Ver todas las piezas" al pie de la grilla de categorías */
+    /* "Ver todas las piezas" al pie de la grilla de grupos */
     .cat-grid-foot { text-align: center; margin-top: 54px; }
 
     /* ── GROUP GRID (portada) ────────────────────────────
@@ -432,6 +418,51 @@
     .cat-card.is-empty .group-card-tag,
     .cat-card.is-empty .group-card-count { color: var(--ink-soft); }
 
+    /* ── TARJETA CON MODELO 3D: FONDO NEGRO ──────────────
+       Va después de las reglas de .is-empty para ganarles: el grupo
+       puede no tener piezas todavía (Ropas hoy) y aun así esta
+       tarjeta NO es una tarjeta vacía. Sobre negro la ropa cruda del
+       modelo recorta con mucha más fuerza que sobre el arena, y el
+       velo de abajo —el mismo de las tarjetas con foto— sostiene el
+       texto en blanco por encima de la figura. */
+    .cat-card.has-model .cat-card-img { background: #000; border: none; }
+    /* Velo más firme que el de una foto: acá abajo la figura tiene la
+       ropa cruda, casi blanca, y el texto en crudo se le perdía
+       encima. Arranca a fundirse al 42% y a los dos tercios ya no
+       toca nada, así que el torso queda limpio. */
+    .cat-card.has-model .cat-card-img::after {
+      display: block;
+      background: linear-gradient(to top,
+        rgba(0,0,0,.94) 0%, rgba(0,0,0,.84) 22%, rgba(0,0,0,.42) 42%, rgba(0,0,0,0) 64%);
+    }
+    .cat-card.has-model .group-card-name  { color: var(--cream); }
+    .cat-card.has-model .group-card-tag   { color: rgba(246, 243, 236, .86); }
+    .cat-card.has-model .group-card-count { color: rgba(246, 243, 236, .72); }
+    .cat-card.has-model .cat-card-init    { color: #4a443a; }
+
+    /* ── MODELO 3D EN LA TARJETA DE UN GRUPO ─────────────
+       El canvas ocupa la tarjeta ENTERA y el modelo se dibuja casi
+       tan grande como el recuadro. El texto le pasa por encima, igual
+       que en una tarjeta con foto, y lo que lo hace legible es el
+       velo del ::after, no dejarle un hueco libre.
+       Fondo transparente: lo que se ve detrás es el negro de la
+       tarjeta. Aparece con un fundido para que no salte de golpe al
+       terminar de cargar.
+       OJO con el tamaño: un <canvas> es un elemento reemplazado, así
+       que con left/right y width:auto se queda en sus 300x150
+       intrínsecos en vez de estirarse. Hay que darle medidas
+       explícitas. */
+    .cat-card-model {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      display: block; pointer-events: none;
+      opacity: 0; transition: opacity .7s ease;
+    }
+    .cat-card-model.on { opacity: 1; }
+    /* La inicial es la reserva: queda a la vista mientras el modelo
+       carga, y para siempre si el navegador no puede con WebGL. */
+    .cat-card.has-model .cat-card-init { transition: opacity .5s ease; }
+    .cat-card.has-model.model-on .cat-card-init { opacity: 0; }
+
     /* Breakpoint propio: dos tarjetas de 3/4 lado a lado se vuelven
        dos torres angostas antes de que el celular las apile por el
        breakpoint general. Abajo de 700px van una debajo de la otra,
@@ -445,17 +476,15 @@
     }
 
     /* ── PÁGINA DE GRUPO ─────────────────────────────────
-       Arriba las categorías del grupo, abajo todas sus piezas.
-       Hoy 11 de 13 categorías están vacías: una página que fuera
-       solo tarjetas "Próximamente" no mostraría nada que comprar. */
-    .group-pieces { margin-top: 78px; border-top: 1px solid var(--sand); padding-top: 44px; }
+       Directamente las piezas del grupo. Las categorías NO se
+       repiten acá en tarjetas: ya están en la tira de arriba, que
+       es donde se filtra. */
     .group-lead {
       font-family: var(--serif); font-size: clamp(16px, 2vw, 19px); font-style: italic;
       color: var(--ink-soft); max-width: 52ch; margin: -18px 0 38px;
     }
     @media (max-width: 860px) {
-      .group-pieces { margin-top: 54px; padding-top: 32px; }
-      .group-lead   { margin: -10px 0 28px; }
+      .group-lead { margin: -10px 0 28px; }
     }
 
     /* Skeleton de carga */
@@ -662,10 +691,7 @@
       .catalog { padding: 44px 16px 54px; }
       .catalog-head { margin-bottom: 26px; }
       .grid { grid-template-columns: repeat(2, 1fr); gap: 28px 12px; }
-      .cat-grid { grid-template-columns: repeat(2, 1fr); gap: 16px 12px; }
       .cat-card-body { padding: 14px 14px 13px; }
-      .cat-card-name { font-size: 17px; }
-      .cat-card-count { margin-top: 5px; font-size: 9.5px; letter-spacing: 1.6px; }
       .cat-card-init { font-size: 40px; }
       .cat-grid-foot { margin-top: 38px; }
       .card-name { font-size: 16.5px; }
@@ -719,7 +745,6 @@
 
     @media (max-width: 380px) {
       .grid { gap: 24px 10px; }
-      .cat-grid { gap: 14px 10px; }
       .cat-nav-inner { gap: 16px; }
       .qty-row { gap: 14px; }
       .cart-item { grid-template-columns: 64px 1fr; }
@@ -739,7 +764,7 @@
 
     /* Pantallas muy chicas: 2 columnas ya no entran */
     @media (max-width: 330px) {
-      .grid, .cat-grid { grid-template-columns: 1fr; }
+      .grid { grid-template-columns: 1fr; }
     }
 
     /* Celular acostado: el hero no puede tapar toda la pantalla */
@@ -877,14 +902,7 @@
       <span class="catalog-count" id="group-count"></span>
     </div>
     <p class="group-lead" id="group-lead"></p>
-    <div id="group-categories"></div>
-    <div class="group-pieces">
-      <div class="catalog-head">
-        <h2 class="catalog-title" id="group-pieces-title">Todas las piezas</h2>
-        <span class="catalog-count" id="group-pieces-count"></span>
-      </div>
-      <div id="group-products"></div>
-    </div>
+    <div id="group-products"></div>
   </section>
 </div>
 
@@ -1341,15 +1359,22 @@ function renderGroupGrid() {
     : '';
 
   const cards = groups.map(g => {
-    const cover = g.cover
-      ? `<img src="${escapeHtml(g.cover)}" alt="${escapeHtml(g.name)}" loading="lazy">`
-      : `<div class="cat-card-init">${escapeHtml(g.name.trim().charAt(0).toUpperCase())}</div>`;
+    const inicial = `<div class="cat-card-init">${escapeHtml(g.name.trim().charAt(0).toUpperCase())}</div>`;
+    // Un grupo con modelo 3D no usa foto de portada: la tarjeta la
+    // ocupa el modelo. La inicial va igual, DEBAJO del canvas, como
+    // reserva: es lo que se ve mientras carga y lo que queda si el
+    // navegador no puede con WebGL.
+    const media = g.model
+      ? `${inicial}<canvas class="cat-card-model" data-model="${escapeHtml(g.model)}" aria-hidden="true"></canvas>`
+      : (g.cover
+          ? `<img src="${escapeHtml(g.cover)}" alt="${escapeHtml(g.name)}" loading="lazy">`
+          : inicial);
     const pie = g.count
       ? `${g.count} pieza${g.count === 1 ? '' : 's'} · ${g.catCount} categoría${g.catCount === 1 ? '' : 's'}`
       : 'Próximamente';
     return `
-      <button class="cat-card${g.count ? '' : ' is-empty'}" onclick="goGroup('${g.slug}')" aria-label="Ver ${escapeHtml(g.name)}">
-        <div class="cat-card-img">${cover}</div>
+      <button class="cat-card${g.count ? '' : ' is-empty'}${g.model ? ' has-model' : ''}" onclick="goGroup('${g.slug}')" aria-label="Ver ${escapeHtml(g.name)}">
+        <div class="cat-card-img">${media}</div>
         <div class="cat-card-body">
           <div class="group-card-name">${escapeHtml(g.name)}</div>
           <div class="group-card-tag">${escapeHtml(g.tagline)}</div>
@@ -1363,6 +1388,272 @@ function renderGroupGrid() {
     : '';
 
   wrap.innerHTML = `<div class="group-grid">${cards}</div>${foot}`;
+  initGroupModels();
+}
+
+/* ── MODELO 3D DE LA TARJETA DE UN GRUPO ──────────────────────
+ * Hoy lo usa ROPAS: una figura que gira a medida que el visitante
+ * scrollea. El modelo se declara en api/_groups.js (campo "model").
+ *
+ * TRES REGLAS QUE MANDAN ACÁ:
+ * 1. NADA se descarga hasta que la tarjeta está por entrar en
+ *    pantalla. three.js + el loader + el .glb son ~860 KB: cargarlos
+ *    en el arranque castigaría a todo el que abre la home en datos
+ *    móviles, que es el caso normal en Paraguay.
+ * 2. Si algo falla —sin WebGL, sin ES modules, el .glb no baja— la
+ *    tarjeta se queda como estaba, con la inicial. Nunca un hueco.
+ * 3. No se dibuja un solo cuadro de más: se pinta cuando cambia la
+ *    rotación o el tamaño, y el bucle se corta entero cuando la
+ *    tarjeta sale de pantalla.
+ *
+ * Los tres módulos se sirven del propio repo (/js), no de un CDN:
+ * la tienda no depende de que un tercero esté en línea. Y el import
+ * de 'three' adentro de GLTFLoader.js está reescrito a una ruta
+ * relativa, así que NO hace falta un <script type="importmap">
+ * (que Safari solo entiende desde iOS 16.4).
+ */
+const VUELTAS_SCROLL = 1.25;   // vueltas completas de punta a punta
+const MARGEN_MODELO  = 1.04;   // >1: la figura desborda un poco el cuadro
+const SUBIR_MODELO   = 0.08;   // fracción del alto que se sube la figura
+let modelosActivos = [];
+
+function destruirModelos() {
+  modelosActivos.forEach(m => m.destruir());
+  modelosActivos = [];
+}
+
+function hayWebGL() {
+  try {
+    const c = document.createElement('canvas');
+    return !!(window.WebGLRenderingContext && (c.getContext('webgl2') || c.getContext('webgl')));
+  } catch { return false; }
+}
+
+/* Engancha los canvas que haya en la grilla recién dibujada. */
+function initGroupModels() {
+  destruirModelos();
+  const canvas = document.querySelectorAll('.cat-card-model');
+  if (!canvas.length || !hayWebGL() || !('IntersectionObserver' in window)) return;
+
+  const io = new IntersectionObserver((entradas, obs) => {
+    entradas.forEach(e => {
+      if (!e.isIntersecting) return;
+      obs.unobserve(e.target);     // una sola vez: después manda el bucle
+      arrancarModelo(e.target);
+    });
+  }, { rootMargin: '300px 0px' });
+
+  canvas.forEach(c => io.observe(c));
+}
+
+async function arrancarModelo(canvas) {
+  const card = canvas.closest('.cat-card');
+  if (!card) return;
+
+  let THREE, GLTFLoader, MeshoptDecoder;
+  try {
+    // El .glb viene comprimido con meshopt (14,5 MB → 739 KB), así que
+    // el decodificador no es opcional: sin él el loader no lo abre.
+    [THREE, { GLTFLoader }, { MeshoptDecoder }] = await Promise.all([
+      import('/js/three.module.min.js'),
+      import('/js/GLTFLoader.js'),
+      import('/js/meshopt_decoder.module.js'),
+    ]);
+  } catch (err) {
+    console.warn('No se pudo cargar three.js; la tarjeta se queda con la inicial.', err);
+    return;
+  }
+
+  let renderer;
+  try {
+    renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: 'low-power' });
+  } catch (err) {
+    console.warn('WebGL no arrancó.', err); return;
+  }
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+
+  const scene  = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 100);
+
+  // Luz cálida y suave, a tono con la paleta del sitio. Solo la usan
+  // los modelos con material PBR; el de ropas viene "shaded", con la
+  // luz ya horneada, y no se entera de estas luces (ver más abajo).
+  scene.add(new THREE.HemisphereLight(0xfff4e6, 0x8d8272, 2.0));
+  const principal = new THREE.DirectionalLight(0xffffff, 2.6);
+  principal.position.set(2, 3, 3);
+  scene.add(principal);
+  const relleno = new THREE.DirectionalLight(0xffe6cc, 1.1);
+  relleno.position.set(-3, 1, -2);
+  scene.add(relleno);
+
+  let gltf;
+  try {
+    gltf = await new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).loadAsync(canvas.dataset.model);
+  } catch (err) {
+    console.warn('No se pudo cargar el modelo 3D.', err);
+    renderer.dispose(); return;
+  }
+
+  const raiz = gltf.scene;
+
+  // MODELO CON LUZ HORNEADA ("shaded"): el escáner ya dejó la
+  // iluminación pintada en una textura emissive, y el color base
+  // viene en negro. Renderizarlo con un material PBR lo pasa por el
+  // tone mapping y sale lavado y sin contraste. Se lo cambia por un
+  // material sin luz, que muestra la textura tal cual fue horneada
+  // —que es todo el punto de un modelo así— y encima es más barato
+  // de dibujar. Un modelo PBR normal no entra por acá y sigue
+  // usando las luces de arriba.
+  let sinLuz = false;
+  raiz.traverse(o => {
+    if (!o.isMesh || !o.material || !o.material.emissiveMap) return;
+    const m = o.material;
+    o.material = new THREE.MeshBasicMaterial({
+      map: m.emissiveMap, side: m.side, transparent: m.transparent, alphaTest: m.alphaTest,
+    });
+    m.dispose();
+    sinLuz = true;
+  });
+  if (!sinLuz) {
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.15;
+  }
+
+  // El modelo trae su propio centro y escala del escáner: se lo
+  // recentra en el origen y se lo mete en un grupo, que es lo que
+  // rota (rotar el modelo sobre su centro original lo haría orbitar).
+  const caja = new THREE.Box3().setFromObject(raiz);
+  const medida = caja.getSize(new THREE.Vector3());
+  raiz.position.sub(caja.getCenter(new THREE.Vector3()));
+  const pivote = new THREE.Group();
+  pivote.add(raiz);
+  // Se sube DESPUÉS de centrar, para que el recorte que sobra caiga
+  // arriba (el cuello) y no repartido arriba y abajo. Como el giro es
+  // sobre el eje Y, correrla en Y no la hace orbitar.
+  pivote.position.y = medida.y * SUBIR_MODELO;
+  scene.add(pivote);
+
+  // Ancho que barre la figura AL GIRAR: no es su ancho de frente,
+  // sino el del cilindro que describe. Encuadrar con el ancho de
+  // frente la dejaría entrando y saliendo de cuadro en cada vuelta.
+  const anchoAlGirar = Math.hypot(medida.x, medida.z);
+  const tanFov = Math.tan((camera.fov / 2) * Math.PI / 180);
+
+  /* encuadrar() — la distancia de cámara. Con MARGEN_MODELO por
+     encima de 1 la figura queda un poco MÁS GRANDE que el cuadro y
+     se recorta contra el borde, en vez de entrar entera con aire
+     alrededor. Eso, junto con SUBIR_MODELO, es lo que deja el corte
+     del cuello del escaneo fuera de cuadro: la figura sube y el
+     sobrante se lo lleva el borde de arriba. Lo que queda corto por
+     abajo cae debajo del velo y del texto, donde no se ve.
+     Se recalcula en cada cambio de tamaño porque la tarjeta es
+     vertical en escritorio y apaisada en celular. */
+  function encuadrar(aspecto) {
+    const porAlto  = (medida.y / MARGEN_MODELO / 2) / tanFov;
+    const porAncho = (anchoAlGirar / MARGEN_MODELO / 2) / (tanFov * aspecto);
+    camera.position.set(0, 0, Math.max(porAlto, porAncho));
+    camera.lookAt(0, 0, 0);
+  }
+
+  // Con "menos movimiento" activado se dibuja la pose de arranque y
+  // listo: no se ata nada al scroll.
+  const quieto = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  let visible = true, raf = 0, ancho = 0, alto = 0, rotAnterior = null, muerto = false;
+  // forzar: hay que pintar aunque no haya cambiado nada. Un canvas
+  // WebGL sin preserveDrawingBuffer puede quedar VACÍO cuando el
+  // navegador lo vuelve a componer sin que se haya dibujado de nuevo.
+  // Pasa siempre que el modelo esté quieto: con "menos movimiento"
+  // activado la rotación nunca cambia, así que sin esto la figura
+  // desaparecía al volver a entrar en pantalla.
+  let forzar = true;
+
+  /* progreso() — 0 justo cuando la tarjeta asoma por abajo, 1 justo
+     cuando termina de salir por arriba, y 0,5 exactamente cuando está
+     centrada en la pantalla. Se mide contra el BORDE SUPERIOR y no
+     contra el centro: con el centro el recorrido no queda normalizado
+     a 0–1 (da ~-0,20 a 0,80) y la figura llegaba de perfil al medio
+     de la pantalla en vez de de frente.
+     Es función de la posición, no del tiempo: scrolleando para atrás
+     el modelo gira para el otro lado. */
+  function progreso() {
+    const r = card.getBoundingClientRect();
+    const vh = window.innerHeight || document.documentElement.clientHeight;
+    return (vh - r.top) / (vh + r.height);
+  }
+
+  function dibujar() {
+    raf = 0;
+    if (muerto) return;
+
+    const w = Math.round(canvas.clientWidth), h = Math.round(canvas.clientHeight);
+    if (!w || !h) return;
+
+    let cambio = false;
+    if (w !== ancho || h !== alto) {
+      ancho = w; alto = h;
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      encuadrar(camera.aspect);
+      camera.updateProjectionMatrix();
+      cambio = true;
+    }
+    // Se resta 0,5 para que la figura mire de frente justo cuando la
+    // tarjeta pasa por el medio de la pantalla, que es donde el ojo
+    // se le queda. De ahí gira para los dos lados según se scrollee
+    // para abajo o para arriba.
+    const rot = quieto ? 0 : (progreso() - 0.5) * Math.PI * 2 * VUELTAS_SCROLL;
+    if (rotAnterior === null || Math.abs(rot - rotAnterior) > 0.0008) {
+      rotAnterior = rot;
+      pivote.rotation.y = rot;
+      cambio = true;
+    }
+    if (!cambio && !forzar) return;
+    forzar = false;
+    renderer.render(scene, camera);
+    if (!canvas.classList.contains('on')) {
+      canvas.classList.add('on');
+      card.classList.add('model-on');
+    }
+  }
+
+  function pedirDibujo() { if (!raf && visible && !muerto) raf = requestAnimationFrame(dibujar); }
+
+  // El bucle no queda corriendo con la tarjeta fuera de pantalla.
+  const ioVis = new IntersectionObserver(es => {
+    visible = es[0].isIntersecting;
+    if (visible) { forzar = true; pedirDibujo(); }
+    else if (raf) { cancelAnimationFrame(raf); raf = 0; }
+  }, { rootMargin: '100px 0px' });
+  ioVis.observe(canvas);
+
+  // Si el navegador tira el contexto (pasa en celulares con poca
+  // memoria), se recupera y se vuelve a pintar en vez de quedar el
+  // hueco vacío.
+  canvas.addEventListener('webglcontextlost', e => { e.preventDefault(); if (raf) { cancelAnimationFrame(raf); raf = 0; } });
+  canvas.addEventListener('webglcontextrestored', () => { ancho = alto = 0; forzar = true; pedirDibujo(); });
+
+  if (!quieto) window.addEventListener('scroll', pedirDibujo, { passive: true });
+  window.addEventListener('resize', pedirDibujo, { passive: true });
+  pedirDibujo();
+
+  modelosActivos.push({
+    destruir() {
+      muerto = true;
+      if (raf) cancelAnimationFrame(raf);
+      ioVis.disconnect();
+      window.removeEventListener('scroll', pedirDibujo);
+      window.removeEventListener('resize', pedirDibujo);
+      scene.traverse(o => {
+        if (o.geometry) o.geometry.dispose();
+        if (o.material) [].concat(o.material).forEach(m => {
+          Object.values(m).forEach(v => v && v.isTexture && v.dispose());
+          m.dispose();
+        });
+      });
+      renderer.dispose();
+    },
+  });
 }
 
 /* Los dos grupos también en el footer, desde los mismos datos. */
@@ -1373,62 +1664,35 @@ function renderFooterGroups() {
 }
 
 /*
- * catCardHtml(c) — tarjeta de categoría. Se usa dentro de la página
- * de grupo (la portada ya no las muestra). Las categorías sin piezas
- * se muestran igual, marcadas "Próximamente": son la estructura de
- * la tienda, no un listado de stock.
- */
-function catCardHtml(c) {
-  const n = c.count || 0;
-  const cover = c.cover
-    ? `<img src="${escapeHtml(c.cover)}" alt="${escapeHtml(c.name)}" loading="lazy">`
-    : `<div class="cat-card-init">${escapeHtml(c.name.trim().charAt(0).toUpperCase())}</div>`;
-  return `
-    <button class="cat-card${n ? '' : ' is-empty'}" onclick="goCategory('${c.slug}')" aria-label="Ver ${escapeHtml(c.name)}">
-      <div class="cat-card-img">${cover}</div>
-      <div class="cat-card-body">
-        <div class="cat-card-name">${escapeHtml(c.name)}</div>
-        <div class="cat-card-count">${n ? `${n} pieza${n === 1 ? '' : 's'}` : 'Próximamente'}</div>
-      </div>
-    </button>`;
-}
-
-/*
- * renderGroupPage(slug) — el nivel intermedio: arriba las categorías
- * del grupo, abajo TODAS sus piezas juntas.
- * Van las dos cosas y no solo las categorías porque hoy 11 de las 13
- * están vacías: una página que fuera nada más que tarjetas
- * "Próximamente" no le mostraría al visitante nada que pueda comprar.
+ * renderGroupPage(slug) — el nivel intermedio: TODAS las piezas del
+ * grupo, directo. Las categorías no se repiten acá en tarjetas: ya
+ * están en la tira de arriba, que es donde se filtra. El visitante
+ * que entra a "Ropas" quiere ver ropa, no otro menú.
  */
 function renderGroupPage(slug) {
   const g = findGroup(slug);
   if (!g) return;
 
-  const cats = catsOfGroup(slug);
   const list = productsOfGroup(slug)
     .sort((a, b) => (b.destacado === true) - (a.destacado === true));
 
   document.getElementById('group-title').textContent = g.name;
   document.getElementById('group-lead').textContent  = g.tagline;
-  document.getElementById('group-count').textContent = cats.length
-    ? `${cats.length} categoría${cats.length === 1 ? '' : 's'}`
+  document.getElementById('group-count').textContent = list.length
+    ? `${list.length} pieza${list.length === 1 ? '' : 's'}`
     : '';
 
-  document.getElementById('group-categories').innerHTML =
-    `<div class="cat-grid">${cats.map(catCardHtml).join('')}</div>`;
+  const wrap = document.getElementById('group-products');
 
-  const pieces = document.querySelector('#page-group .group-pieces');
-  const wrap   = document.getElementById('group-products');
-
-  // Sin piezas en todo el grupo, el bloque de abajo sobra: las
-  // tarjetas de categoría ya dicen "Próximamente" y repetirlo en un
-  // segundo vacío solo hace la página más larga y más triste.
-  if (!list.length) { pieces.style.display = 'none'; wrap.innerHTML = ''; return; }
-  pieces.style.display = '';
-
-  document.getElementById('group-pieces-title').textContent = `Todas las piezas de ${g.noun}`;
-  document.getElementById('group-pieces-count').textContent =
-    `${list.length} pieza${list.length === 1 ? '' : 's'}`;
+  if (!list.length) {
+    wrap.innerHTML = `<div class="empty-msg">
+      <div class="big">Todavía no hay piezas acá</div>
+      <p>Estamos tejiendo la colección de ${escapeHtml(g.noun)}.
+         Escribinos por WhatsApp y te avisamos cuando lleguen.</p>
+      <button class="btn ghost" onclick="showPage('home')" style="margin-top:22px">Volver al inicio</button>
+    </div>`;
+    return;
+  }
 
   // showCat: dentro del grupo se mezclan varias categorías, así que
   // el rótulo de cada tarjeta sí aporta (a diferencia del listado de

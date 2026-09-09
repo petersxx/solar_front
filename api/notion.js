@@ -143,6 +143,7 @@ module.exports = async function handler(req, res) {
         name: g.name,
         noun: g.noun,
         tagline: g.tagline,
+        model: g.model || null,
         cats: cats.map(c => c.slug),
         count,
         catCount: cats.filter(c => c.count > 0).length,
