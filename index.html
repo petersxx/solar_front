@@ -228,6 +228,12 @@
     @keyframes pageIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 
     /* ── HERO ───────────────────────────────────────────── */
+    /* El video es VERTICAL (9:16) y el hero es apaisado. A lo ancho
+       con object-fit:cover se vería apenas una franja del 30% del
+       alto, así que va DIVIDIDO: texto a la izquierda y el video
+       entero a la derecha, a toda la altura. Recién en celular
+       (≤700px, más abajo) el video pasa a llenar todo el fondo: ahí
+       la pantalla ya es casi tan alta como el video. */
     .hero {
       position: relative; height: min(78vh, 680px); min-height: 420px;
       overflow: hidden; background: var(--ink);
@@ -235,27 +241,41 @@
     /* svh = alto real del viewport: evita el salto cuando el navegador
        del celular esconde/muestra la barra de direcciones */
     @supports (height: 100svh) { .hero { height: min(78svh, 680px); } }
-    .hero-img {
-      position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
-      opacity: 0; transition: opacity 1.4s ease; transform: scale(1.04);
+    .hero-inner {
+      height: 100%; max-width: 1360px; margin: 0 auto; padding: 0 32px;
+      display: flex; justify-content: space-between; gap: 48px;
     }
-    .hero-img.on { opacity: 1; animation: heroZoom 9s ease forwards; }
-    @keyframes heroZoom { from { transform: scale(1.08); } to { transform: scale(1.0); } }
-    .hero::after {
-      content: ''; position: absolute; inset: 0;
-      background: linear-gradient(to top, rgba(20,16,12,.62) 0%, rgba(20,16,12,.18) 45%, rgba(20,16,12,.25) 100%);
-    }
+    /* El ancho sale del alto: height 100% + aspect-ratio. flex:none
+       para que el texto no lo aplaste en pantallas angostas. */
+    .hero-media { position: relative; flex: none; height: 100%; aspect-ratio: 9 / 16; background: #1a1714; }
+    .hero-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
     .hero-content {
-      position: absolute; inset: 0; z-index: 2;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      text-align: center; color: var(--cream); padding: 0 24px;
+      position: relative; z-index: 2; flex: 1; min-width: 0;
+      display: flex; flex-direction: column; align-items: flex-start; justify-content: center;
+      text-align: left; color: var(--cream);
     }
     .hero-kicker { font-size: 12px; letter-spacing: 5px; text-transform: uppercase; margin-bottom: 18px; opacity: .92; }
     .hero-title {
       font-family: var(--serif); font-weight: 500; font-style: italic;
-      font-size: clamp(30px, 7.2vw, 68px); line-height: 1.12; max-width: 750px; margin-bottom: 30px;
+      font-size: clamp(34px, 4.8vw, 66px); line-height: 1.12; max-width: 750px; margin-bottom: 30px;
     }
     .hero-title em { font-style: normal; }
+
+    /* Celular: el video llena el fondo y el texto va centrado encima,
+       con un velo para que se lea sobre la imagen. */
+    @media (max-width: 700px) {
+      .hero-inner { display: block; max-width: none; padding: 0; }
+      .hero-media { position: absolute; inset: 0; height: auto; aspect-ratio: auto; }
+      /* El recorte sobra de arriba y de abajo: se carga hacia abajo
+         para que en las tomas de pie no se pierda la cara. */
+      .hero-video { object-position: 50% 22%; }
+      .hero-media::after {
+        content: ''; position: absolute; inset: 0;
+        background: linear-gradient(to top, rgba(20,16,12,.62) 0%, rgba(20,16,12,.18) 45%, rgba(20,16,12,.25) 100%);
+      }
+      .hero-content { position: absolute; inset: 0; align-items: center; text-align: center; padding: 0 24px; }
+      .hero-title { font-size: clamp(30px, 7.2vw, 68px); }
+    }
 
     /* ── EDITORIAL STRIP ────────────────────────────────── */
     .editorial {
@@ -654,7 +674,7 @@
 
     /* Tablet / notebook chica: solo achicar los márgenes */
     @media (max-width: 1100px) {
-      .header-inner, .cat-nav-inner, .footer-inner { padding-left: 24px; padding-right: 24px; }
+      .header-inner, .cat-nav-inner, .footer-inner, .hero-inner { padding-left: 24px; padding-right: 24px; }
       .catalog, .detail, .cart-wrap { padding-left: 24px; padding-right: 24px; }
       .detail-grid { gap: 44px; }
     }
@@ -783,8 +803,8 @@
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }
       *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
-      .hero-img.on { animation: none; }
-      /* Los videos no arrancan solos: el JS les pone controles. */
+      /* Los videos no arrancan solos: el del hero se queda en su
+         poster, y a los del oficio el JS les pone controles. */
     }
   </style>
 </head>
@@ -831,14 +851,18 @@
 <!-- ── HOME ───────────────────────────────────────────────── -->
 <div id="page-home" class="page active">
   <section class="hero" id="hero">
-    <img class="hero-img" alt="Manos de artesano sosteniendo una guampa de madera tallada y pirograbada" src="/img/hero-1-guampa.jpg" width="1800" height="1200" fetchpriority="high" decoding="async">
-    <img class="hero-img" alt="Retablos paraguayos tallados en madera" src="/img/hero-2-retablos.jpg" width="1800" height="1200" decoding="async">
-    <img class="hero-img" alt="Detalle de una camisa de aopoi con botones de madera" src="/img/hero-3-aopoi.jpg" width="1800" height="1200" decoding="async">
-    <img class="hero-img" alt="Ñanduti tejido a mano en hilos de colores" src="/img/hero-4-nanduti.jpg" width="1800" height="1200" decoding="async">
-    <div class="hero-content">
-      <div class="hero-kicker">Tejido a mano · Paraguay</div>
-      <h1 class="hero-title">Piezas con historia,<br><em>hechas para durar.</em></h1>
-      <button class="btn light" onclick="scrollToCatalog()">Ver colección</button>
+    <div class="hero-inner">
+      <div class="hero-content">
+        <div class="hero-kicker">Tejido a mano · Paraguay</div>
+        <h1 class="hero-title">Piezas con historia,<br><em>hechas para durar.</em></h1>
+        <button class="btn light" onclick="scrollToCatalog()">Ver colección</button>
+      </div>
+      <div class="hero-media">
+        <!-- Sin autoplay: lo arranca el JS, que respeta "menos movimiento" -->
+        <video class="hero-video" src="/img/hero.mp4" poster="/img/hero.jpg"
+               width="720" height="1280" muted loop playsinline preload="metadata"
+               aria-hidden="true"></video>
+      </div>
     </div>
   </section>
 
@@ -2017,19 +2041,18 @@ function renderCheckout() {
     <button class="btn ghost" onclick="showPage('cart')" style="width:100%;margin-top:14px">← Volver al carrito</button>`;
 }
 
-/* ── 10. HERO (crossfade) ─────────────────────────────────── */
+/* ── 10. HERO (video) ─────────────────────────────────────── */
+// Mudo y en bucle, como un GIF. Se pausa cuando sale de pantalla, y
+// también al pasar a otra página: #page-home queda en display:none y
+// el observer lo informa igual. Con "menos movimiento" no arranca y
+// queda el poster.
 function startHero() {
-  const imgs = document.querySelectorAll('.hero-img');
-  if (!imgs.length) return;
-  let idx = 0;
-  imgs[0].classList.add('on');
-  if (imgs.length > 1) {
-    setInterval(() => {
-      imgs[idx].classList.remove('on');
-      idx = (idx + 1) % imgs.length;
-      imgs[idx].classList.add('on');
-    }, 7000);
-  }
+  const v = document.querySelector('.hero-video');
+  if (!v || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const play = () => v.play().catch(() => {});   // iOS en ahorro de energía lo rechaza: queda el poster
+  if (!('IntersectionObserver' in window)) return play();
+  new IntersectionObserver(([e]) => e.isIntersecting ? play() : v.pause(),
+                           { threshold: 0.1 }).observe(v);
 }
 
 /* ── 11. NOTION (carga de datos) ──────────────────────────── */
