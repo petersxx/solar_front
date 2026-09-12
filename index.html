@@ -242,7 +242,11 @@
        del celular esconde/muestra la barra de direcciones */
     @supports (height: 100svh) { .hero { height: min(78svh, 680px); } }
     .hero-media { position: absolute; inset: 0; }
-    .hero-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+    /* Anclado ARRIBA: ahí está la cara de la modelo. En escritorio el
+       encuadre de cada toma ya viene hecho en el archivo (el recorte
+       se mueve en cada corte de escena), así que arriba de ese
+       recorte está la cara también en la toma acostada. */
+    .hero-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 0%; display: block; }
     .hero-media::after {
       content: ''; position: absolute; inset: 0;
       background: linear-gradient(to top, rgba(20,16,12,.62) 0%, rgba(20,16,12,.18) 45%, rgba(20,16,12,.25) 100%);
@@ -258,10 +262,6 @@
       font-size: clamp(30px, 7.2vw, 68px); line-height: 1.12; max-width: 750px; margin-bottom: 30px;
     }
     .hero-title em { font-style: normal; }
-    /* Celular: acá va el video vertical entero (hero.mp4) y el recorte
-       sobra de arriba y de abajo. Se carga hacia abajo para que en
-       las tomas de pie no se pierda la cara. */
-    @media (max-width: 700px) { .hero-video { object-position: 50% 22%; } }
 
     /* ── EDITORIAL STRIP ────────────────────────────────── */
     .editorial {
