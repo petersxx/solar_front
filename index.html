@@ -228,12 +228,12 @@
     @keyframes pageIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 
     /* ── HERO ───────────────────────────────────────────── */
-    /* El video es VERTICAL (9:16) y el hero es apaisado. A lo ancho
-       con object-fit:cover se vería apenas una franja del 30% del
-       alto, así que va DIVIDIDO: texto a la izquierda y el video
-       entero a la derecha, a toda la altura. Recién en celular
-       (≤700px, más abajo) el video pasa a llenar todo el fondo: ahí
-       la pantalla ya es casi tan alta como el video. */
+    /* Video a todo el ancho con el texto centrado encima. El video es
+       VERTICAL (9:16) y el hero apaisado: en escritorio se ve solo la
+       franja del medio (~30% del alto), que es donde está el tejido
+       del vestido. Para esa franja se sirve un recorte apaisado del
+       original a 1080px (hero-escritorio.mp4) en vez de estirar el de
+       720px del celular. Ver la sección 4d de la bitácora. */
     .hero {
       position: relative; height: min(78vh, 680px); min-height: 420px;
       overflow: hidden; background: var(--ink);
@@ -241,41 +241,27 @@
     /* svh = alto real del viewport: evita el salto cuando el navegador
        del celular esconde/muestra la barra de direcciones */
     @supports (height: 100svh) { .hero { height: min(78svh, 680px); } }
-    .hero-inner {
-      height: 100%; max-width: 1360px; margin: 0 auto; padding: 0 32px;
-      display: flex; justify-content: space-between; gap: 48px;
-    }
-    /* El ancho sale del alto: height 100% + aspect-ratio. flex:none
-       para que el texto no lo aplaste en pantallas angostas. */
-    .hero-media { position: relative; flex: none; height: 100%; aspect-ratio: 9 / 16; background: #1a1714; }
+    .hero-media { position: absolute; inset: 0; }
     .hero-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+    .hero-media::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(20,16,12,.62) 0%, rgba(20,16,12,.18) 45%, rgba(20,16,12,.25) 100%);
+    }
     .hero-content {
-      position: relative; z-index: 2; flex: 1; min-width: 0;
-      display: flex; flex-direction: column; align-items: flex-start; justify-content: center;
-      text-align: left; color: var(--cream);
+      position: absolute; inset: 0; z-index: 2;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; color: var(--cream); padding: 0 24px;
     }
     .hero-kicker { font-size: 12px; letter-spacing: 5px; text-transform: uppercase; margin-bottom: 18px; opacity: .92; }
     .hero-title {
       font-family: var(--serif); font-weight: 500; font-style: italic;
-      font-size: clamp(34px, 4.8vw, 66px); line-height: 1.12; max-width: 750px; margin-bottom: 30px;
+      font-size: clamp(30px, 7.2vw, 68px); line-height: 1.12; max-width: 750px; margin-bottom: 30px;
     }
     .hero-title em { font-style: normal; }
-
-    /* Celular: el video llena el fondo y el texto va centrado encima,
-       con un velo para que se lea sobre la imagen. */
-    @media (max-width: 700px) {
-      .hero-inner { display: block; max-width: none; padding: 0; }
-      .hero-media { position: absolute; inset: 0; height: auto; aspect-ratio: auto; }
-      /* El recorte sobra de arriba y de abajo: se carga hacia abajo
-         para que en las tomas de pie no se pierda la cara. */
-      .hero-video { object-position: 50% 22%; }
-      .hero-media::after {
-        content: ''; position: absolute; inset: 0;
-        background: linear-gradient(to top, rgba(20,16,12,.62) 0%, rgba(20,16,12,.18) 45%, rgba(20,16,12,.25) 100%);
-      }
-      .hero-content { position: absolute; inset: 0; align-items: center; text-align: center; padding: 0 24px; }
-      .hero-title { font-size: clamp(30px, 7.2vw, 68px); }
-    }
+    /* Celular: acá va el video vertical entero (hero.mp4) y el recorte
+       sobra de arriba y de abajo. Se carga hacia abajo para que en
+       las tomas de pie no se pierda la cara. */
+    @media (max-width: 700px) { .hero-video { object-position: 50% 22%; } }
 
     /* ── EDITORIAL STRIP ────────────────────────────────── */
     .editorial {
@@ -674,7 +660,7 @@
 
     /* Tablet / notebook chica: solo achicar los márgenes */
     @media (max-width: 1100px) {
-      .header-inner, .cat-nav-inner, .footer-inner, .hero-inner { padding-left: 24px; padding-right: 24px; }
+      .header-inner, .cat-nav-inner, .footer-inner { padding-left: 24px; padding-right: 24px; }
       .catalog, .detail, .cart-wrap { padding-left: 24px; padding-right: 24px; }
       .detail-grid { gap: 44px; }
     }
@@ -851,18 +837,20 @@
 <!-- ── HOME ───────────────────────────────────────────────── -->
 <div id="page-home" class="page active">
   <section class="hero" id="hero">
-    <div class="hero-inner">
-      <div class="hero-content">
-        <div class="hero-kicker">Tejido a mano · Paraguay</div>
-        <h1 class="hero-title">Piezas con historia,<br><em>hechas para durar.</em></h1>
-        <button class="btn light" onclick="scrollToCatalog()">Ver colección</button>
-      </div>
-      <div class="hero-media">
-        <!-- Sin autoplay: lo arranca el JS, que respeta "menos movimiento" -->
-        <video class="hero-video" src="/img/hero.mp4" poster="/img/hero.jpg"
-               width="720" height="1280" muted loop playsinline preload="metadata"
-               aria-hidden="true"></video>
-      </div>
+    <div class="hero-media">
+      <!-- Sin autoplay: lo arranca el JS, que respeta "menos movimiento".
+           El navegador elige la fuente una sola vez, al cargar. El que
+           no entiende "media" se queda con la primera, que igual anda. -->
+      <video class="hero-video" poster="/img/hero.jpg"
+             muted loop playsinline preload="metadata" aria-hidden="true">
+        <source src="/img/hero.mp4" type="video/mp4" media="(max-width: 700px)">
+        <source src="/img/hero-escritorio.mp4" type="video/mp4">
+      </video>
+    </div>
+    <div class="hero-content">
+      <div class="hero-kicker">Tejido a mano · Paraguay</div>
+      <h1 class="hero-title">Piezas con historia,<br><em>hechas para durar.</em></h1>
+      <button class="btn light" onclick="scrollToCatalog()">Ver colección</button>
     </div>
   </section>
 
