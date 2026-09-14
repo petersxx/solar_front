@@ -431,7 +431,7 @@
        modelo recorta con mucha más fuerza que sobre el arena, y el
        velo de abajo —el mismo de las tarjetas con foto— sostiene el
        texto en blanco por encima de la figura. */
-    .cat-card.has-model .cat-card-img { background: #000; border: none; }
+    .cat-card.has-model .cat-card-img { background: rgba(246, 243, 236, .72); border: none; }
     /* Velo más firme que el de una foto: acá abajo la figura tiene la
        ropa cruda, casi blanca, y el texto en crudo se le perdía
        encima. Arranca a fundirse al 42% y a los dos tercios ya no
@@ -1430,7 +1430,7 @@ function renderGroupGrid() {
  * relativa, así que NO hace falta un <script type="importmap">
  * (que Safari solo entiende desde iOS 16.4).
  */
-const VUELTAS_SCROLL = 1.25;   // vueltas completas de punta a punta
+const VELOCIDAD_ROTACION = (Math.PI * 2) / 14;   // rad/s: una vuelta cada 14s
 const MARGEN_MODELO  = 1.04;   // >1: la figura desborda un poco el cuadro
 const SUBIR_MODELO   = 0.08;   // fracción del alto que se sube la figura
 let modelosActivos = [];
@@ -1579,7 +1579,7 @@ async function arrancarModelo(canvas) {
   // listo: no se ata nada al scroll.
   const quieto = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  let visible = true, raf = 0, ancho = 0, alto = 0, rotAnterior = null, muerto = false;
+  let visible = true, raf = 0, ancho = 0, alto = 0, tiempoAnterior = 0, muerto = false;
   // forzar: hay que pintar aunque no haya cambiado nada. Un canvas
   // WebGL sin preserveDrawingBuffer puede quedar VACÍO cuando el
   // navegador lo vuelve a componer sin que se haya dibujado de nuevo.
@@ -1588,21 +1588,7 @@ async function arrancarModelo(canvas) {
   // desaparecía al volver a entrar en pantalla.
   let forzar = true;
 
-  /* progreso() — 0 justo cuando la tarjeta asoma por abajo, 1 justo
-     cuando termina de salir por arriba, y 0,5 exactamente cuando está
-     centrada en la pantalla. Se mide contra el BORDE SUPERIOR y no
-     contra el centro: con el centro el recorrido no queda normalizado
-     a 0–1 (da ~-0,20 a 0,80) y la figura llegaba de perfil al medio
-     de la pantalla en vez de de frente.
-     Es función de la posición, no del tiempo: scrolleando para atrás
-     el modelo gira para el otro lado. */
-  function progreso() {
-    const r = card.getBoundingClientRect();
-    const vh = window.innerHeight || document.documentElement.clientHeight;
-    return (vh - r.top) / (vh + r.height);
-  }
-
-  function dibujar() {
+  function dibujar(t) {
     raf = 0;
     if (muerto) return;
 
@@ -1618,14 +1604,13 @@ async function arrancarModelo(canvas) {
       camera.updateProjectionMatrix();
       cambio = true;
     }
-    // Se resta 0,5 para que la figura mire de frente justo cuando la
-    // tarjeta pasa por el medio de la pantalla, que es donde el ojo
-    // se le queda. De ahí gira para los dos lados según se scrollee
-    // para abajo o para arriba.
-    const rot = quieto ? 0 : (progreso() - 0.5) * Math.PI * 2 * VUELTAS_SCROLL;
-    if (rotAnterior === null || Math.abs(rot - rotAnterior) > 0.0008) {
-      rotAnterior = rot;
-      pivote.rotation.y = rot;
+    // Gira sola, a velocidad constante, sin depender del scroll. dt se
+    // capa a 100ms para que una pestaña en segundo plano (donde rAF se
+    // pausa) no la haga pegar un salto grande al volver.
+    if (!quieto) {
+      const dt = tiempoAnterior ? Math.min((t - tiempoAnterior) / 1000, 0.1) : 0;
+      tiempoAnterior = t;
+      pivote.rotation.y += VELOCIDAD_ROTACION * dt;
       cambio = true;
     }
     if (!cambio && !forzar) return;
@@ -1635,6 +1620,9 @@ async function arrancarModelo(canvas) {
       canvas.classList.add('on');
       card.classList.add('model-on');
     }
+    // Mientras esté visible y no haya "menos movimiento", el propio
+    // bucle se reprograma: no espera a un scroll o resize.
+    if (!quieto) pedirDibujo();
   }
 
   function pedirDibujo() { if (!raf && visible && !muerto) raf = requestAnimationFrame(dibujar); }
@@ -1642,7 +1630,7 @@ async function arrancarModelo(canvas) {
   // El bucle no queda corriendo con la tarjeta fuera de pantalla.
   const ioVis = new IntersectionObserver(es => {
     visible = es[0].isIntersecting;
-    if (visible) { forzar = true; pedirDibujo(); }
+    if (visible) { forzar = true; tiempoAnterior = 0; pedirDibujo(); }
     else if (raf) { cancelAnimationFrame(raf); raf = 0; }
   }, { rootMargin: '100px 0px' });
   ioVis.observe(canvas);
@@ -1651,9 +1639,8 @@ async function arrancarModelo(canvas) {
   // memoria), se recupera y se vuelve a pintar en vez de quedar el
   // hueco vacío.
   canvas.addEventListener('webglcontextlost', e => { e.preventDefault(); if (raf) { cancelAnimationFrame(raf); raf = 0; } });
-  canvas.addEventListener('webglcontextrestored', () => { ancho = alto = 0; forzar = true; pedirDibujo(); });
+  canvas.addEventListener('webglcontextrestored', () => { ancho = alto = 0; tiempoAnterior = 0; forzar = true; pedirDibujo(); });
 
-  if (!quieto) window.addEventListener('scroll', pedirDibujo, { passive: true });
   window.addEventListener('resize', pedirDibujo, { passive: true });
   pedirDibujo();
 
