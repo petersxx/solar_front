@@ -141,6 +141,31 @@
       background: var(--ink); color: var(--cream); text-align: center;
       font-size: 11px; letter-spacing: 2.5px; text-transform: uppercase;
       padding: 9px 16px;
+      overflow: hidden;
+    }
+    /* Carrusel infinito: la pista lleva DOS grupos idénticos y se corre
+       exactamente -50%, o sea el ancho de un grupo. En ese punto el
+       segundo grupo está donde arrancó el primero, así que el salto al
+       volver a 0 no se ve. Cada grupo repite las frases las veces
+       necesarias para ser más ancho que la pantalla (~3000px): si fuera
+       más angosto, antes del salto quedaría un hueco vacío a la derecha.
+       Todo aria-hidden: el lector de pantalla lee la frase una sola vez
+       desde .sr-only, no la lista repetida. */
+    .announce { padding-left: 0; padding-right: 0; }
+    .announce-track {
+      display: flex; width: max-content;
+      animation: announceScroll 45s linear infinite;
+    }
+    .announce-group { display: flex; flex-shrink: 0; }
+    .announce-group span { white-space: nowrap; }
+    .announce-group span::after { content: '·'; padding: 0 22px; opacity: .6; }
+    @keyframes announceScroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+    @media (hover: hover) and (pointer: fine) {
+      .announce:hover .announce-track { animation-play-state: paused; }
+    }
+    .sr-only {
+      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
     }
     header {
       position: sticky; top: 0; z-index: 500;
@@ -424,55 +449,25 @@
     .cat-card.is-empty .group-card-tag,
     .cat-card.is-empty .group-card-count { color: var(--ink-soft); }
 
-    /* ── TARJETA CON MODELO 3D: FONDO DEL MISMO CREMA DE LA PÁGINA ──
-       Va después de las reglas de .is-empty para ganarles: el grupo
-       puede no tener piezas todavía (Ropas hoy) y aun así esta
-       tarjeta NO es una tarjeta vacía. Sin borde y con var(--cream),
-       el modelo queda flotando sobre la página en vez de dentro de
-       un recuadro. Al ser claro el fondo, el texto va en tinta. */
-    .cat-card.has-model .cat-card-img { background: var(--cream); border: none; }
-    /* Velo en crema, no en negro: sobre fondo claro uno oscuro
-       ensucia. Tapa la parte baja de la figura para que el texto en
-       tinta se lea encima. Arranca a fundirse al 42% y a los dos
-       tercios ya no toca nada, así que el torso queda limpio. */
-    .cat-card.has-model .cat-card-img::after {
-      display: block;
-      background: linear-gradient(to top,
-        rgba(246,243,236,.96) 0%, rgba(246,243,236,.86) 22%, rgba(246,243,236,.45) 42%, rgba(246,243,236,0) 64%);
+    /* Foto fija de grupo (campo "image" de api/_groups.js): son fotos
+       de persona, así que se anclan cerca de ARRIBA para que el
+       recorte —sobre todo el cuadrado del celular— no corte la cara. */
+    .cat-card-img img.group-photo { object-position: 50% 12%; }
+    /* Segunda foto (campo "imageHover"): va encima de la primera,
+       invisible, y aparece con un fundido al pasar el mouse (ver el
+       bloque de hover). Se descarga igual que la primera, así que al
+       pasar el mouse ya está lista y el fundido no parpadea. */
+    .cat-card-img img.group-photo-b {
+      position: absolute; inset: 0;
+      opacity: 0; transition: opacity .9s ease, transform .8s ease;
     }
-    .cat-card.has-model .group-card-name  { color: var(--ink); }
-    .cat-card.has-model .group-card-tag,
-    .cat-card.has-model .group-card-count { color: var(--ink-soft); }
-
-    /* ── MODELO 3D EN LA TARJETA DE UN GRUPO ─────────────
-       El canvas ocupa la tarjeta ENTERA y el modelo se dibuja casi
-       tan grande como el recuadro. El texto le pasa por encima, igual
-       que en una tarjeta con foto, y lo que lo hace legible es el
-       velo del ::after, no dejarle un hueco libre.
-       Fondo transparente: lo que se ve detrás es el crema de la
-       tarjeta. Aparece con un fundido para que no salte de golpe al
-       terminar de cargar.
-       OJO con el tamaño: un <canvas> es un elemento reemplazado, así
-       que con left/right y width:auto se queda en sus 300x150
-       intrínsecos en vez de estirarse. Hay que darle medidas
-       explícitas. */
-    .cat-card-model {
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      display: block; pointer-events: none;
-      opacity: 0; transition: opacity .7s ease;
-    }
-    .cat-card-model.on { opacity: 1; }
-    /* La inicial es la reserva: queda a la vista mientras el modelo
-       carga, y para siempre si el navegador no puede con WebGL. */
-    .cat-card.has-model .cat-card-init { transition: opacity .5s ease; }
-    .cat-card.has-model.model-on .cat-card-init { opacity: 0; }
+    .cat-card:focus-visible .group-photo-b { opacity: 1; }
 
     /* Breakpoint propio: dos tarjetas de 4/5 lado a lado se vuelven
        dos torres angostas antes de que el celular las apile por el
        breakpoint general. Abajo de 700px van una debajo de la otra
        y CUADRADAS: son las dos puertas de entrada de la tienda y en
-       apaisado quedaban chicas. Al cuadrado también le viene mejor
-       el modelo 3D, que es una figura vertical. */
+       apaisado quedaban chicas. */
     @media (max-width: 700px) {
       /* El tope de ancho es para el tramo de arriba del rango (tablet
          chica, celular acostado): sin él, en 700px la tarjeta sale de
@@ -634,6 +629,7 @@
       .btn.ghost:hover { background: var(--ink); color: var(--cream); }
       .cat-link:hover { color: var(--ink); }
       .cat-card:hover .cat-card-img img { transform: scale(1.05); }
+      .cat-card:hover .group-photo-b { opacity: 1; }
       .card:hover .card-img-a { transform: scale(1.05); }
       .card:hover .card-img-b { opacity: 1; transform: scale(1.05); }
       .back-link:hover { color: var(--ink); }
@@ -683,7 +679,7 @@
       .search-box input { font-size: 16px; padding-top: 10px; padding-bottom: 10px; }
       #search-clear { padding: 8px; right: -4px; }
 
-      .announce { letter-spacing: 1.6px; padding: 8px 14px; font-size: 10.5px; }
+      .announce { letter-spacing: 1.6px; padding: 8px 0; font-size: 10.5px; }
 
       .cat-nav-inner { padding: 0 16px; gap: 20px; }
       .cat-link { padding: 15px 2px 13px; }   /* área táctil más alta */
@@ -767,7 +763,7 @@
       .search-toggle, .cart-btn { padding: 9px 6px; }
       .search-toggle svg { width: 19px; height: 19px; }
       .cart-btn svg { width: 20px; height: 20px; }
-      .announce { font-size: 10px; letter-spacing: 1.2px; padding: 7px 10px; }
+      .announce { font-size: 10px; letter-spacing: 1.2px; padding: 7px 0; }
       .catalog, .detail, .cart-wrap, .footer-inner { padding-left: 13px; padding-right: 13px; }
       .cat-nav-inner { padding: 0 13px; }
     }
@@ -786,6 +782,8 @@
     /* Respetar a quien pidió menos animación en el sistema */
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }
+      /* El anuncio no se desplaza: queda quieto al principio. */
+      .announce-track { animation: none !important; }
       *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
       /* Los videos no arrancan solos: el del hero se queda en su
          poster, y a los del oficio el JS les pone controles. */
@@ -802,7 +800,13 @@
 </div>
 
 <!-- ── ANNOUNCE + HEADER ──────────────────────────────────── -->
-<div class="announce">Hecho a mano en Paraguay · Envíos a todo el país</div>
+<div class="announce">
+  <span class="sr-only">Hecho a mano en Paraguay · Envíos a todo el país</span>
+  <div class="announce-track" aria-hidden="true">
+    <div class="announce-group"><span>Hecho a mano en Paraguay</span><span>Envíos a todo el país</span><span>Hecho a mano en Paraguay</span><span>Envíos a todo el país</span><span>Hecho a mano en Paraguay</span><span>Envíos a todo el país</span><span>Hecho a mano en Paraguay</span><span>Envíos a todo el país</span><span>Hecho a mano en Paraguay</span><span>Envíos a todo el país</span><span>Hecho a mano en Paraguay</span><span>Envíos a todo el país</span></div>
+    <div class="announce-group"><span>Hecho a mano en Paraguay</span><span>Envíos a todo el país</span><span>Hecho a mano en Paraguay</span><span>Envíos a todo el país</span><span>Hecho a mano en Paraguay</span><span>Envíos a todo el país</span><span>Hecho a mano en Paraguay</span><span>Envíos a todo el país</span><span>Hecho a mano en Paraguay</span><span>Envíos a todo el país</span><span>Hecho a mano en Paraguay</span><span>Envíos a todo el país</span></div>
+  </div>
+</div>
 <header>
   <div class="header-inner">
     <div class="header-left">
@@ -1376,20 +1380,22 @@ function renderGroupGrid() {
 
   const cards = groups.map(g => {
     const inicial = `<div class="cat-card-init">${escapeHtml(g.name.trim().charAt(0).toUpperCase())}</div>`;
-    // Un grupo con modelo 3D no usa foto de portada: la tarjeta la
-    // ocupa el modelo. La inicial va igual, DEBAJO del canvas, como
-    // reserva: es lo que se ve mientras carga y lo que queda si el
-    // navegador no puede con WebGL.
-    const media = g.model
-      ? `${inicial}<canvas class="cat-card-model" data-model="${escapeHtml(g.model)}" aria-hidden="true"></canvas>`
-      : (g.cover
-          ? `<img src="${escapeHtml(g.cover)}" alt="${escapeHtml(g.name)}" loading="lazy">`
-          : inicial);
+    // Un grupo con foto fija (campo "image" de api/_groups.js) la usa
+    // en vez de la portada calculada del catálogo.
+    const foto = g.image || g.cover;
+    // Con "imageHover", una segunda foto encima que aparece al pasar
+    // el mouse (decorativa: alt vacío, la tarjeta ya tiene nombre).
+    const media = foto
+      ? `<img src="${escapeHtml(foto)}" alt="${escapeHtml(g.name)}" loading="lazy"${g.image ? ' class="group-photo"' : ''}>`
+        + (g.image && g.imageHover
+            ? `<img src="${escapeHtml(g.imageHover)}" alt="" aria-hidden="true" loading="lazy" class="group-photo group-photo-b">`
+            : '')
+      : inicial;
     const pie = g.count
       ? `${g.count} pieza${g.count === 1 ? '' : 's'} · ${g.catCount} categoría${g.catCount === 1 ? '' : 's'}`
       : 'Próximamente';
     return `
-      <button class="cat-card${g.count ? '' : ' is-empty'}${g.model ? ' has-model' : ''}" onclick="goGroup('${g.slug}')" aria-label="Ver ${escapeHtml(g.name)}">
+      <button class="cat-card${g.count || g.image ? '' : ' is-empty'}" onclick="goGroup('${g.slug}')" aria-label="Ver ${escapeHtml(g.name)}">
         <div class="cat-card-img">${media}</div>
         <div class="cat-card-body">
           <div class="group-card-name">${escapeHtml(g.name)}</div>
@@ -1404,261 +1410,6 @@ function renderGroupGrid() {
     : '';
 
   wrap.innerHTML = `<div class="group-grid">${cards}</div>${foot}`;
-  initGroupModels();
-}
-
-/* ── MODELO 3D DE LA TARJETA DE UN GRUPO ──────────────────────
- * Hoy lo usa ROPAS: una figura que gira a medida que el visitante
- * scrollea. El modelo se declara en api/_groups.js (campo "model").
- *
- * TRES REGLAS QUE MANDAN ACÁ:
- * 1. NADA se descarga hasta que la tarjeta está por entrar en
- *    pantalla. three.js + el loader + el .glb son ~860 KB: cargarlos
- *    en el arranque castigaría a todo el que abre la home en datos
- *    móviles, que es el caso normal en Paraguay.
- * 2. Si algo falla —sin WebGL, sin ES modules, el .glb no baja— la
- *    tarjeta se queda como estaba, con la inicial. Nunca un hueco.
- * 3. No se dibuja un solo cuadro de más: se pinta cuando cambia la
- *    rotación o el tamaño, y el bucle se corta entero cuando la
- *    tarjeta sale de pantalla.
- *
- * Los tres módulos se sirven del propio repo (/js), no de un CDN:
- * la tienda no depende de que un tercero esté en línea. Y el import
- * de 'three' adentro de GLTFLoader.js está reescrito a una ruta
- * relativa, así que NO hace falta un <script type="importmap">
- * (que Safari solo entiende desde iOS 16.4).
- */
-const VELOCIDAD_ROTACION = (Math.PI * 2) / 14;   // rad/s: una vuelta cada 14s
-const MARGEN_MODELO  = 1.04;   // >1: la figura desborda un poco el cuadro
-const SUBIR_MODELO   = 0.08;   // fracción del alto que se sube la figura
-let modelosActivos = [];
-
-function destruirModelos() {
-  modelosActivos.forEach(m => m.destruir());
-  modelosActivos = [];
-}
-
-function hayWebGL() {
-  try {
-    const c = document.createElement('canvas');
-    return !!(window.WebGLRenderingContext && (c.getContext('webgl2') || c.getContext('webgl')));
-  } catch { return false; }
-}
-
-/* Engancha los canvas que haya en la grilla recién dibujada. */
-function initGroupModels() {
-  destruirModelos();
-  const canvas = document.querySelectorAll('.cat-card-model');
-  if (!canvas.length || !hayWebGL() || !('IntersectionObserver' in window)) return;
-
-  const io = new IntersectionObserver((entradas, obs) => {
-    entradas.forEach(e => {
-      if (!e.isIntersecting) return;
-      obs.unobserve(e.target);     // una sola vez: después manda el bucle
-      arrancarModelo(e.target);
-    });
-  }, { rootMargin: '300px 0px' });
-
-  canvas.forEach(c => io.observe(c));
-}
-
-async function arrancarModelo(canvas) {
-  const card = canvas.closest('.cat-card');
-  if (!card) return;
-
-  let THREE, GLTFLoader, MeshoptDecoder;
-  try {
-    // El .glb viene comprimido con meshopt (14,5 MB → 739 KB), así que
-    // el decodificador no es opcional: sin él el loader no lo abre.
-    [THREE, { GLTFLoader }, { MeshoptDecoder }] = await Promise.all([
-      import('/js/three.module.min.js'),
-      import('/js/GLTFLoader.js'),
-      import('/js/meshopt_decoder.module.js'),
-    ]);
-  } catch (err) {
-    console.warn('No se pudo cargar three.js; la tarjeta se queda con la inicial.', err);
-    return;
-  }
-
-  let renderer;
-  try {
-    renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: 'low-power' });
-  } catch (err) {
-    console.warn('WebGL no arrancó.', err); return;
-  }
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-
-  const scene  = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 100);
-
-  // Luz cálida y suave, a tono con la paleta del sitio. Solo la usan
-  // los modelos con material PBR; el de ropas viene "shaded", con la
-  // luz ya horneada, y no se entera de estas luces (ver más abajo).
-  scene.add(new THREE.HemisphereLight(0xfff4e6, 0x8d8272, 2.0));
-  const principal = new THREE.DirectionalLight(0xffffff, 2.6);
-  principal.position.set(2, 3, 3);
-  scene.add(principal);
-  const relleno = new THREE.DirectionalLight(0xffe6cc, 1.1);
-  relleno.position.set(-3, 1, -2);
-  scene.add(relleno);
-
-  let gltf;
-  try {
-    gltf = await new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).loadAsync(canvas.dataset.model);
-  } catch (err) {
-    console.warn('No se pudo cargar el modelo 3D.', err);
-    renderer.dispose(); return;
-  }
-
-  const raiz = gltf.scene;
-
-  // MODELO CON LUZ HORNEADA ("shaded"): el escáner ya dejó la
-  // iluminación pintada en una textura emissive, y el color base
-  // viene en negro. Renderizarlo con un material PBR lo pasa por el
-  // tone mapping y sale lavado y sin contraste. Se lo cambia por un
-  // material sin luz, que muestra la textura tal cual fue horneada
-  // —que es todo el punto de un modelo así— y encima es más barato
-  // de dibujar. Un modelo PBR normal no entra por acá y sigue
-  // usando las luces de arriba.
-  let sinLuz = false;
-  raiz.traverse(o => {
-    if (!o.isMesh || !o.material || !o.material.emissiveMap) return;
-    const m = o.material;
-    o.material = new THREE.MeshBasicMaterial({
-      map: m.emissiveMap, side: m.side, transparent: m.transparent, alphaTest: m.alphaTest,
-    });
-    m.dispose();
-    sinLuz = true;
-  });
-  if (!sinLuz) {
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.15;
-  }
-
-  // El modelo trae su propio centro y escala del escáner: se lo
-  // recentra en el origen y se lo mete en un grupo, que es lo que
-  // rota (rotar el modelo sobre su centro original lo haría orbitar).
-  const caja = new THREE.Box3().setFromObject(raiz);
-  const medida = caja.getSize(new THREE.Vector3());
-  raiz.position.sub(caja.getCenter(new THREE.Vector3()));
-  const pivote = new THREE.Group();
-  pivote.add(raiz);
-  // Se sube DESPUÉS de centrar, para que el recorte que sobra caiga
-  // arriba (el cuello) y no repartido arriba y abajo. Como el giro es
-  // sobre el eje Y, correrla en Y no la hace orbitar.
-  pivote.position.y = medida.y * SUBIR_MODELO;
-  scene.add(pivote);
-
-  // Ancho que barre la figura AL GIRAR: no es su ancho de frente,
-  // sino el del cilindro que describe. Encuadrar con el ancho de
-  // frente la dejaría entrando y saliendo de cuadro en cada vuelta.
-  const anchoAlGirar = Math.hypot(medida.x, medida.z);
-  const tanFov = Math.tan((camera.fov / 2) * Math.PI / 180);
-
-  /* encuadrar() — la distancia de cámara. Con MARGEN_MODELO por
-     encima de 1 la figura queda un poco MÁS GRANDE que el cuadro y
-     se recorta contra el borde, en vez de entrar entera con aire
-     alrededor. Eso, junto con SUBIR_MODELO, es lo que deja el corte
-     del cuello del escaneo fuera de cuadro: la figura sube y el
-     sobrante se lo lleva el borde de arriba. Lo que queda corto por
-     abajo cae debajo del velo y del texto, donde no se ve.
-     Se recalcula en cada cambio de tamaño porque la tarjeta es
-     vertical en escritorio y apaisada en celular. */
-  function encuadrar(aspecto) {
-    const porAlto  = (medida.y / MARGEN_MODELO / 2) / tanFov;
-    // El ancho nunca se recorta: si la figura se saliera de costado
-    // se le cortarían los brazos al girar.
-    const porAncho = (anchoAlGirar / MARGEN_MODELO / 2) / (tanFov * aspecto);
-    camera.position.set(0, 0, Math.max(porAlto, porAncho));
-    camera.lookAt(0, 0, 0);
-  }
-
-  // Con "menos movimiento" activado se dibuja la pose de arranque y
-  // listo: no se ata nada al scroll.
-  const quieto = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  let visible = true, raf = 0, ancho = 0, alto = 0, tiempoAnterior = 0, muerto = false;
-  // forzar: hay que pintar aunque no haya cambiado nada. Un canvas
-  // WebGL sin preserveDrawingBuffer puede quedar VACÍO cuando el
-  // navegador lo vuelve a componer sin que se haya dibujado de nuevo.
-  // Pasa siempre que el modelo esté quieto: con "menos movimiento"
-  // activado la rotación nunca cambia, así que sin esto la figura
-  // desaparecía al volver a entrar en pantalla.
-  let forzar = true;
-
-  function dibujar(t) {
-    raf = 0;
-    if (muerto) return;
-
-    const w = Math.round(canvas.clientWidth), h = Math.round(canvas.clientHeight);
-    if (!w || !h) return;
-
-    let cambio = false;
-    if (w !== ancho || h !== alto) {
-      ancho = w; alto = h;
-      renderer.setSize(w, h, false);
-      camera.aspect = w / h;
-      encuadrar(camera.aspect);
-      camera.updateProjectionMatrix();
-      cambio = true;
-    }
-    // Gira sola, a velocidad constante, sin depender del scroll. dt se
-    // capa a 100ms para que una pestaña en segundo plano (donde rAF se
-    // pausa) no la haga pegar un salto grande al volver.
-    if (!quieto) {
-      const dt = tiempoAnterior ? Math.min((t - tiempoAnterior) / 1000, 0.1) : 0;
-      tiempoAnterior = t;
-      pivote.rotation.y += VELOCIDAD_ROTACION * dt;
-      cambio = true;
-    }
-    if (!cambio && !forzar) return;
-    forzar = false;
-    renderer.render(scene, camera);
-    if (!canvas.classList.contains('on')) {
-      canvas.classList.add('on');
-      card.classList.add('model-on');
-    }
-    // Mientras esté visible y no haya "menos movimiento", el propio
-    // bucle se reprograma: no espera a un scroll o resize.
-    if (!quieto) pedirDibujo();
-  }
-
-  function pedirDibujo() { if (!raf && visible && !muerto) raf = requestAnimationFrame(dibujar); }
-
-  // El bucle no queda corriendo con la tarjeta fuera de pantalla.
-  const ioVis = new IntersectionObserver(es => {
-    visible = es[0].isIntersecting;
-    if (visible) { forzar = true; tiempoAnterior = 0; pedirDibujo(); }
-    else if (raf) { cancelAnimationFrame(raf); raf = 0; }
-  }, { rootMargin: '100px 0px' });
-  ioVis.observe(canvas);
-
-  // Si el navegador tira el contexto (pasa en celulares con poca
-  // memoria), se recupera y se vuelve a pintar en vez de quedar el
-  // hueco vacío.
-  canvas.addEventListener('webglcontextlost', e => { e.preventDefault(); if (raf) { cancelAnimationFrame(raf); raf = 0; } });
-  canvas.addEventListener('webglcontextrestored', () => { ancho = alto = 0; tiempoAnterior = 0; forzar = true; pedirDibujo(); });
-
-  window.addEventListener('resize', pedirDibujo, { passive: true });
-  pedirDibujo();
-
-  modelosActivos.push({
-    destruir() {
-      muerto = true;
-      if (raf) cancelAnimationFrame(raf);
-      ioVis.disconnect();
-      window.removeEventListener('scroll', pedirDibujo);
-      window.removeEventListener('resize', pedirDibujo);
-      scene.traverse(o => {
-        if (o.geometry) o.geometry.dispose();
-        if (o.material) [].concat(o.material).forEach(m => {
-          Object.values(m).forEach(v => v && v.isTexture && v.dispose());
-          m.dispose();
-        });
-      });
-      renderer.dispose();
-    },
-  });
 }
 
 /* Los dos grupos también en el footer, desde los mismos datos. */

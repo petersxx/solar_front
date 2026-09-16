@@ -12,8 +12,9 @@
  *  (vercel.json reescribe /artesanias y /ropas hacia acá)
  *
  *  El reparto de categorías por grupo vive en api/_groups.js.
- *  La foto de portada sale del catálogo: la primera pieza con
- *  foto de alguna categoría del grupo (en Notion no hay dónde
+ *  La foto de portada es la foto fija del grupo ("image" en
+ *  _groups.js) si tiene; si no, sale del catálogo: la primera pieza
+ *  con foto de alguna categoría del grupo (en Notion no hay dónde
  *  guardar una imagen de grupo).
  * ============================================================
  */
@@ -84,8 +85,8 @@ module.exports = async function handler(req, res) {
       return cat ? groupOf(slugify(cat)) === group.slug : false;
     });
 
-    let cover = null;
-    for (const r of inGroup) {
+    let cover = group.image ? `${BASE_URL}${group.image}` : null;
+    if (!cover) for (const r of inGroup) {
       const files = r.properties.Foto?.files || [];
       const first = files[0];
       cover = first ? (first.type === 'external' ? first.external.url : first.file.url)

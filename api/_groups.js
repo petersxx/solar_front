@@ -70,12 +70,14 @@ const GROUPS = [
     // "ropa paraguaya". El visitante ve name; el buscador, seoName.
     seoName: 'Ropa',
     noun: 'ropa',
-    // Modelo 3D de la tarjeta de la portada, que rota con el scroll.
-    // Si está, reemplaza a la foto de portada calculada del catálogo.
-    // Para sacarlo alcanza con borrar esta línea. Ver sección 4c de
-    // la bitácora: el .glb no se sirve tal cual como sale del
-    // escáner, se comprime antes (19,6 MB → 260 KB).
-    model: '/modelos/ropas.glb',
+    // Foto fija de la tarjeta de la portada. Si está, reemplaza a la
+    // foto calculada del catálogo (la primera pieza con foto) y es
+    // también la og:image de /ropas. Para volver a la calculada,
+    // borrar esta línea.
+    image: '/img/vesti-con-solar.jpg',
+    // Segunda foto: en escritorio, al pasar el mouse por la tarjeta,
+    // la primera se funde en esta. Solo se usa si hay "image".
+    imageHover: '/img/vesti-con-solar-hover.jpg',
     tagline: 'Aopoi, encaje ju y lienzo: la artesanía paraguaya que no se guarda, se lleva puesta.',
     cats: ['aopoi', 'camisas', 'chombas', 'ninos', 'lienzo', 'encaje-ju'],
   },
