@@ -424,34 +424,32 @@
     .cat-card.is-empty .group-card-tag,
     .cat-card.is-empty .group-card-count { color: var(--ink-soft); }
 
-    /* ── TARJETA CON MODELO 3D: FONDO NEGRO ──────────────
+    /* ── TARJETA CON MODELO 3D: FONDO DEL MISMO CREMA DE LA PÁGINA ──
        Va después de las reglas de .is-empty para ganarles: el grupo
        puede no tener piezas todavía (Ropas hoy) y aun así esta
-       tarjeta NO es una tarjeta vacía. Sobre negro la ropa cruda del
-       modelo recorta con mucha más fuerza que sobre el arena, y el
-       velo de abajo —el mismo de las tarjetas con foto— sostiene el
-       texto en blanco por encima de la figura. */
-    .cat-card.has-model .cat-card-img { background:  #26221d; border: none; }
-    /* Velo más firme que el de una foto: acá abajo la figura tiene la
-       ropa cruda, casi blanca, y el texto en crudo se le perdía
-       encima. Arranca a fundirse al 42% y a los dos tercios ya no
-       toca nada, así que el torso queda limpio. */
+       tarjeta NO es una tarjeta vacía. Sin borde y con var(--cream),
+       el modelo queda flotando sobre la página en vez de dentro de
+       un recuadro. Al ser claro el fondo, el texto va en tinta. */
+    .cat-card.has-model .cat-card-img { background: var(--cream); border: none; }
+    /* Velo en crema, no en negro: sobre fondo claro uno oscuro
+       ensucia. Tapa la parte baja de la figura para que el texto en
+       tinta se lea encima. Arranca a fundirse al 42% y a los dos
+       tercios ya no toca nada, así que el torso queda limpio. */
     .cat-card.has-model .cat-card-img::after {
       display: block;
       background: linear-gradient(to top,
-        rgba(0,0,0,.94) 0%, rgba(0,0,0,.84) 22%, rgba(0,0,0,.42) 42%, rgba(0,0,0,0) 64%);
+        rgba(246,243,236,.96) 0%, rgba(246,243,236,.86) 22%, rgba(246,243,236,.45) 42%, rgba(246,243,236,0) 64%);
     }
-    .cat-card.has-model .group-card-name  { color: var(--cream); }
-    .cat-card.has-model .group-card-tag   { color: rgba(246, 243, 236, .86); }
-    .cat-card.has-model .group-card-count { color: rgba(246, 243, 236, .72); }
-    .cat-card.has-model .cat-card-init    { color: #4a443a; }
+    .cat-card.has-model .group-card-name  { color: var(--ink); }
+    .cat-card.has-model .group-card-tag,
+    .cat-card.has-model .group-card-count { color: var(--ink-soft); }
 
     /* ── MODELO 3D EN LA TARJETA DE UN GRUPO ─────────────
        El canvas ocupa la tarjeta ENTERA y el modelo se dibuja casi
        tan grande como el recuadro. El texto le pasa por encima, igual
        que en una tarjeta con foto, y lo que lo hace legible es el
        velo del ::after, no dejarle un hueco libre.
-       Fondo transparente: lo que se ve detrás es el negro de la
+       Fondo transparente: lo que se ve detrás es el crema de la
        tarjeta. Aparece con un fundido para que no salte de golpe al
        terminar de cargar.
        OJO con el tamaño: un <canvas> es un elemento reemplazado, así
