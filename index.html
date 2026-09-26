@@ -338,16 +338,20 @@
     .lookbook { max-width: 1360px; margin: 0 auto; padding: 74px 32px 40px; }
 
     #page-home { --hdr: 74px; }
-    #page-home .group-grid, #page-home .catalog-head {
-      /* dos columnas 4:5 con 26px de hueco y ~96px de aire arriba y abajo */
-      --gg-w: min(1000px, max(480px, calc((100vh - var(--hdr) - 96px) * 1.6 + 26px)));
-      max-width: var(--gg-w);
-    }
+    /* "La colección" en la portada: las dos tarjetas de grupo a TODO
+       el ancho y a todo el alto de la pantalla (menos el header),
+       mitad y mitad. La sección pierde su ancho máximo y sus
+       márgenes; el título y el pie los conservan por su cuenta. */
+    #page-home { --screen: calc(100vh - var(--hdr)); }
     @supports (height: 100svh) {
-      #page-home .group-grid, #page-home .catalog-head {
-        --gg-w: min(1000px, max(480px, calc((100svh - var(--hdr) - 96px) * 1.6 + 26px)));
-      }
+      #page-home { --screen: calc(100svh - var(--hdr)); }
     }
+    #page-home .catalog { max-width: none; padding-left: 0; padding-right: 0; }
+    #page-home .catalog-head { max-width: 1360px; padding: 0 32px; }
+    #page-home .group-grid { max-width: none; gap: 0; }
+    #page-home .group-grid .cat-card-img,
+    #page-home .group-grid .sk-img { aspect-ratio: auto; height: var(--screen); margin: 0; }
+    #page-home .group-grid .cat-card-body { padding: 0 clamp(28px, 4vw, 64px) clamp(32px, 5vh, 60px); }
     .lb-head { max-width: 680px; margin: 0 auto 56px; text-align: center; }
     .lb-kicker { font-size: 11px; letter-spacing: 4px; text-transform: uppercase; color: var(--clay); margin-bottom: 14px; }
     .lb-head-title {
@@ -504,7 +508,7 @@
     .group-grid .cat-card-img  { aspect-ratio: 4 / 5; }
     /* El encabezado de la home se alinea con la grilla angosta, no
        con los 1360px del catálogo */
-    #page-home .catalog-head { max-width: 1000px; margin-inline: auto; }
+    #page-home .catalog-head { margin-inline: auto; }
     .group-grid .cat-card-body { padding: 32px 30px 28px; }
     /* Velo más cargado que en las categorías: acá hay tres líneas de
        texto sobre la foto, no una. */
@@ -534,6 +538,10 @@
     .cat-card.is-empty .group-card-name  { color: var(--ink); }
     .cat-card.is-empty .group-card-tag,
     .cat-card.is-empty .group-card-count { color: var(--ink-soft); }
+    /* "Ver más": es un <span> con cara de botón porque la tarjeta
+       entera ya es el <button> (no se puede anidar otro) */
+    .group-card-more { margin-top: 22px; pointer-events: none; }
+    .cat-card.is-empty .group-card-more { border-color: var(--ink); color: var(--ink); }
 
     /* Foto fija de grupo (campo "image" de api/_groups.js): son fotos
        de persona, así que se anclan cerca de ARRIBA para que el
@@ -560,16 +568,13 @@
          668x668 y se come la pantalla entera. En un celular normal no
          llega a aplicar y las tarjetas van a todo el ancho. */
       .group-grid { grid-template-columns: 1fr; gap: 18px; max-width: 460px; }
-      /* Portada: las dos cuadradas apiladas tienen que entrar enteras
-         debajo del header */
-      #page-home .group-grid, #page-home .catalog-head {
-        --gg-w: min(460px, max(240px, calc((100vh - var(--hdr) - 60px - 18px) / 2)));
-      }
-      @supports (height: 100svh) {
-        #page-home .group-grid, #page-home .catalog-head {
-          --gg-w: min(460px, max(240px, calc((100svh - var(--hdr) - 60px - 18px) / 2)));
-        }
-      }
+      /* Portada: apiladas, cada una la mitad del alto de la pantalla */
+      #page-home .group-grid { max-width: none; gap: 0; }
+      #page-home .group-grid .cat-card-img,
+      #page-home .group-grid .sk-img { height: calc(var(--screen) / 2); }
+      #page-home .group-grid .cat-card-body { padding: 0 20px 20px; }
+      #page-home .catalog-head { padding: 0 16px; }
+      .group-card-more { margin-top: 14px; padding: 11px 22px; font-size: 11px; }
       .group-grid .cat-card-img  { aspect-ratio: 1 / 1; }
       .group-grid .cat-card-body { padding: 22px 20px 20px; }
       .group-card-tag   { font-size: 12.5px; margin-top: 8px; }
@@ -1621,6 +1626,7 @@ function renderGroupGrid() {
           <div class="group-card-name">${escapeHtml(g.name)}</div>
           <div class="group-card-tag">${escapeHtml(g.tagline)}</div>
           <div class="group-card-count">${pie}</div>
+          <span class="btn light group-card-more" aria-hidden="true">Ver más</span>
         </div>
       </button>`;
   }).join('');
