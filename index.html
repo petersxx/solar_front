@@ -326,6 +326,92 @@
       letter-spacing: 3px; text-transform: uppercase; color: var(--clay); margin-bottom: 9px;
     }
 
+    /* ── LOOKBOOK (portada) ──────────────────────────────
+       Dos columnas: a la izquierda todas las fotos, una debajo de
+       otra, que scrollean normal; a la derecha un panel quieto
+       (sticky, del alto de la pantalla) con los textos apilados en
+       la misma celda. Se ve solo el de la foto que está cruzando el
+       medio de la pantalla (.is-active, lo pone initLookbook) y al
+       cambiar de foto se funden. En celular se apilan intercalados:
+       foto, su texto, foto, su texto (ver --i). Las fotos son
+       verticales 2:3 y se muestran recortadas a 4:5. */
+    .lookbook { max-width: 1360px; margin: 0 auto; padding: 74px 32px 40px; }
+
+    #page-home { --hdr: 74px; }
+    #page-home .group-grid, #page-home .catalog-head {
+      /* dos columnas 4:5 con 26px de hueco y ~96px de aire arriba y abajo */
+      --gg-w: min(1000px, max(480px, calc((100vh - var(--hdr) - 96px) * 1.6 + 26px)));
+      max-width: var(--gg-w);
+    }
+    @supports (height: 100svh) {
+      #page-home .group-grid, #page-home .catalog-head {
+        --gg-w: min(1000px, max(480px, calc((100svh - var(--hdr) - 96px) * 1.6 + 26px)));
+      }
+    }
+    .lb-head { max-width: 680px; margin: 0 auto 56px; text-align: center; }
+    .lb-kicker { font-size: 11px; letter-spacing: 4px; text-transform: uppercase; color: var(--clay); margin-bottom: 14px; }
+    .lb-head-title {
+      font-family: var(--serif); font-weight: 500; font-style: italic;
+      font-size: clamp(26px, 4.4vw, 40px); line-height: 1.2;
+    }
+    .lb-scroller {
+      display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 4fr);
+      gap: 72px; max-width: 1120px; margin: 0 auto 56px;
+    }
+    .lb-photos { display: grid; gap: 48px; align-content: start; }
+    .lb-media { position: relative; aspect-ratio: 4 / 5; overflow: hidden; background: var(--sand); margin: 0; }
+    .lb-media img { width: 100%; height: 100%; object-fit: cover; transition: transform 1.2s ease; }
+    .lb-panel {
+      position: sticky; top: var(--hdr); align-self: start;
+      height: calc(100vh - var(--hdr)); display: grid; align-items: center;
+    }
+    @supports (height: 100svh) {
+      .lb-panel { height: calc(100svh - var(--hdr)); }
+    }
+    .lb-text {
+      grid-area: 1 / 1; max-width: 420px;
+      opacity: 0; visibility: hidden; transform: translateY(14px);
+      transition: opacity .45s ease, transform .45s ease, visibility 0s .45s;
+    }
+    .lb-text.is-active {
+      opacity: 1; visibility: visible; transform: none;
+      transition: opacity .6s ease .15s, transform .6s ease .15s, visibility 0s;
+    }
+    .lb-title {
+      font-family: var(--serif); font-weight: 500; font-style: italic;
+      font-size: clamp(30px, 3.8vw, 48px); line-height: 1.1; margin-bottom: 20px;
+    }
+    .lb-desc { font-size: 15px; line-height: 1.75; color: var(--ink-soft); }
+    .lb-desc + .lb-desc { margin-top: 1.3em; }
+    .lb-media:focus-visible { outline: 2px solid var(--clay); outline-offset: 4px; }
+    .lb-media { cursor: zoom-in; }
+
+    /* Álbum: las fotos del lookbook a pantalla completa. Es un
+       <dialog> nativo: Esc lo cierra y el foco queda adentro solo. */
+    .album {
+      border: none; padding: 0; margin: 0; width: 100vw; height: 100vh;
+      max-width: none; max-height: none; background: rgba(20,17,13,.96); color: var(--cream);
+    }
+    @supports (height: 100dvh) { .album { height: 100dvh; } }
+    .album[open] { display: flex; align-items: center; justify-content: center; }
+    .album::backdrop { background: rgba(20,17,13,.96); }
+    .album-fig { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 16px; max-width: calc(100vw - 180px); }
+    .album-fig img { width: auto; height: auto; max-width: 100%; max-height: calc(100vh - 140px); object-fit: contain; }
+    @supports (height: 100dvh) { .album-fig img { max-height: calc(100dvh - 140px); } }
+    .album-cap { font-family: var(--serif); font-style: italic; font-size: 21px; text-align: center; }
+    .album-count { position: absolute; top: 26px; left: 28px; font-size: 11px; letter-spacing: 3px; color: #b7ada0; }
+    .album-close, .album-nav {
+      position: absolute; display: flex; align-items: center; justify-content: center;
+      background: none; color: var(--cream); line-height: 1; transition: border-color .2s, color .2s;
+    }
+    .album-close { top: 12px; right: 14px; width: 48px; height: 48px; border: none; font-size: 34px; }
+    .album-nav {
+      top: 50%; transform: translateY(-50%); width: 54px; height: 54px;
+      border: 1px solid rgba(246,243,236,.35); font-size: 26px;
+    }
+    .album-nav.prev { left: 28px; }
+    .album-nav.next { right: 28px; }
+
     /* ── PRODUCT GRID ───────────────────────────────────── */
     .catalog { max-width: 1360px; margin: 0 auto; padding: 60px 32px 76px; }
     .catalog-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 36px; gap: 16px; flex-wrap: wrap; }
@@ -474,6 +560,16 @@
          668x668 y se come la pantalla entera. En un celular normal no
          llega a aplicar y las tarjetas van a todo el ancho. */
       .group-grid { grid-template-columns: 1fr; gap: 18px; max-width: 460px; }
+      /* Portada: las dos cuadradas apiladas tienen que entrar enteras
+         debajo del header */
+      #page-home .group-grid, #page-home .catalog-head {
+        --gg-w: min(460px, max(240px, calc((100vh - var(--hdr) - 60px - 18px) / 2)));
+      }
+      @supports (height: 100svh) {
+        #page-home .group-grid, #page-home .catalog-head {
+          --gg-w: min(460px, max(240px, calc((100svh - var(--hdr) - 60px - 18px) / 2)));
+        }
+      }
       .group-grid .cat-card-img  { aspect-ratio: 1 / 1; }
       .group-grid .cat-card-body { padding: 22px 20px 20px; }
       .group-card-tag   { font-size: 12.5px; margin-top: 8px; }
@@ -588,7 +684,10 @@
 
     /* ── FOOTER ─────────────────────────────────────────── */
     footer { background: var(--ink); color: var(--cream); margin-top: 40px; }
-    .footer-inner { max-width: 1360px; margin: 0 auto; padding: 70px 32px 40px; }
+    /* Abajo deja lugar para el botón flotante de WhatsApp (54px + 22px
+       del borde): sin eso, al llegar al final de la página tapaba el
+       crédito de la última fila. */
+    .footer-inner { max-width: 1360px; margin: 0 auto; padding: 70px 32px calc(96px + env(safe-area-inset-bottom, 0px)); }
     .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 48px; margin-bottom: 54px; }
     .footer-logo { font-family: var(--serif); font-size: clamp(23px, 6vw, 30px); letter-spacing: clamp(5px, 1.9vw, 10px); margin-bottom: 14px; }
     .footer-tag { font-size: 13.5px; color: #b7ada0; max-width: 320px; line-height: 1.7; }
@@ -599,6 +698,7 @@
       padding: 5px 0; text-align: left; transition: color .2s; font-family: var(--sans);
     }
     .footer-bottom { border-top: 1px solid rgba(246,243,236,.14); padding-top: 26px; display: flex; justify-content: space-between; gap: 14px; flex-wrap: wrap; font-size: 12px; color: #b7ada0; letter-spacing: 1px; }
+    .footer-credit { color: var(--cream); text-decoration: underline; text-decoration-color: rgba(246,243,236,.35); text-underline-offset: 3px; }
 
     /* ── FLOAT WHATSAPP + TOAST ─────────────────────────── */
     .float-btn {
@@ -639,7 +739,11 @@
       .ci-remove:hover { color: var(--clay); }
       .wa-btn:hover { background: #178a45; }
       .footer-col a:hover, .footer-col button:hover { color: var(--clay); }
+      .footer-credit:hover { color: var(--clay); text-decoration-color: var(--clay); }
       .float-btn:hover { transform: scale(1.08); }
+      .lb-media:hover img { transform: scale(1.04); }
+      .album-nav:hover { border-color: var(--cream); }
+      .album-close:hover { color: var(--clay); }
     }
 
     /* En touch, el feedback es al tocar y se va solo */
@@ -657,6 +761,8 @@
       .header-inner, .cat-nav-inner, .footer-inner { padding-left: 24px; padding-right: 24px; }
       .catalog, .detail, .cart-wrap { padding-left: 24px; padding-right: 24px; }
       .detail-grid { gap: 44px; }
+      .lookbook { padding-left: 24px; padding-right: 24px; }
+      .lb-scroller { gap: 44px; }
     }
 
     /* ── CELULAR ── */
@@ -694,6 +800,24 @@
       .oficio-head { margin-bottom: 30px; }
       .oficio-cap { font-size: 18px; }
 
+      #page-home { --hdr: 59px; }   /* alto del header en celular */
+
+      /* Lookbook apilado: siempre la foto primero, sin importar el
+         lado que tenga en escritorio */
+      .lookbook { padding: 52px 16px 20px; }
+      .lb-head { margin-bottom: 34px; }
+      /* Sin columnas: las fotos y los textos pasan a ser hijos
+         directos de la grilla y se intercalan por su --i */
+      .lb-scroller { grid-template-columns: 1fr; gap: 0; margin-bottom: 0; }
+      .lb-photos, .lb-panel { display: contents; }
+      .lb-media { order: calc(var(--i) * 2); }
+      .lb-text {
+        order: calc(var(--i) * 2 + 1); grid-area: auto; max-width: 560px;
+        opacity: 1; visibility: visible; transform: none; transition: none;
+        margin: 24px 0 60px;
+      }
+      .lb-title { margin-bottom: 14px; }
+
       .catalog { padding: 44px 16px 54px; }
       .catalog-head { margin-bottom: 26px; }
       .grid { grid-template-columns: repeat(2, 1fr); gap: 28px 12px; }
@@ -725,7 +849,7 @@
 
       .co-section { padding: 22px 18px; }
 
-      .footer-inner { padding: 50px 16px 30px; }
+      .footer-inner { padding: 50px 16px calc(84px + env(safe-area-inset-bottom, 0px)); }
       .footer-grid { grid-template-columns: 1fr; gap: 30px; margin-bottom: 38px; }
       .footer-tag { max-width: none; }
       .footer-col a, .footer-col button { padding: 10px 0; }   /* área táctil */
@@ -747,6 +871,16 @@
        Arriba (tablet incluida) entran comodos de a dos. */
     @media (max-width: 620px) {
       .oficio-grid { grid-template-columns: 1fr; gap: 36px; max-width: 420px; }
+      /* Álbum en celular: la foto a todo el ancho y las flechas abajo,
+         donde llega el pulgar (también se pasa deslizando) */
+      .album-fig { max-width: calc(100vw - 24px); }
+      .album-fig img { max-height: calc(100vh - 190px); }
+      @supports (height: 100dvh) { .album-fig img { max-height: calc(100dvh - 190px); } }
+      .album-cap { font-size: 18px; }
+      .album-nav { top: auto; bottom: 18px; transform: none; width: 48px; height: 48px; }
+      .album-nav.prev { left: calc(50% - 58px); }
+      .album-nav.next { right: calc(50% - 58px); }
+      .album-count { top: 24px; left: 18px; }
     }
 
     @media (max-width: 380px) {
@@ -764,7 +898,7 @@
       .search-toggle svg { width: 19px; height: 19px; }
       .cart-btn svg { width: 20px; height: 20px; }
       .announce { font-size: 10px; letter-spacing: 1.2px; padding: 7px 0; }
-      .catalog, .detail, .cart-wrap, .footer-inner { padding-left: 13px; padding-right: 13px; }
+      .catalog, .detail, .cart-wrap, .footer-inner, .lookbook { padding-left: 13px; padding-right: 13px; }
       .cat-nav-inner { padding: 0 13px; }
     }
 
@@ -871,6 +1005,79 @@
       <div class="group-grid">
         <div><div class="sk sk-img"></div></div>
         <div><div class="sk sk-img"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Lookbook "Nuestro álbum": textos PROVISORIOS, los reemplaza el usuario.
+       Cada foto tiene dos tamaños (700 y 1000 px de ancho) y el
+       navegador elige según la pantalla. -->
+  <section class="lookbook" aria-labelledby="lb-heading">
+    <div class="lb-head">
+      <div class="lb-kicker">Vestí con Solar</div>
+      <h2 class="lb-head-title" id="lb-heading">Nuestro álbum</h2>
+    </div>
+
+    <div class="lb-scroller">
+      <div class="lb-photos">
+        <figure class="lb-media" style="--i:0" data-lb="0" onclick="openAlbum(0)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openAlbum(0)}" tabindex="0" role="button" aria-label="Ampliar foto">
+          <img src="/img/lookbook-nanduti.jpg"
+               srcset="/img/lookbook-nanduti-700.jpg 700w, /img/lookbook-nanduti.jpg 1000w"
+               sizes="(max-width: 860px) 100vw, 560px"
+               width="1000" height="1500" loading="lazy" decoding="async"
+               alt="Vestido blanco de ñanduti con flores tejidas y flecos, sobre un maniquí">
+        </figure>
+        <figure class="lb-media" style="--i:1" data-lb="1" onclick="openAlbum(1)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openAlbum(1)}" tabindex="0" role="button" aria-label="Ampliar foto">
+          <img src="/img/lookbook-pasarela.jpg"
+               srcset="/img/lookbook-pasarela-700.jpg 700w, /img/lookbook-pasarela.jpg 1000w"
+               sizes="(max-width: 860px) 100vw, 560px"
+               width="1000" height="1500" loading="lazy" decoding="async"
+               alt="Cuatro modelos vestidos de blanco con prendas de encaje, lienzo plisado y ñanduti">
+        </figure>
+        <figure class="lb-media" style="--i:2" data-lb="2" onclick="openAlbum(2)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openAlbum(2)}" tabindex="0" role="button" aria-label="Ampliar foto">
+          <img src="/img/lookbook-muelle.jpg"
+               srcset="/img/lookbook-muelle-700.jpg 700w, /img/lookbook-muelle.jpg 1000w"
+               sizes="(max-width: 860px) 100vw, 560px"
+               width="1000" height="1500" loading="lazy" decoding="async"
+               alt="Hombre con chaleco y pantalón de lienzo crudo con paños a cuadros verdes, en un muelle al atardecer">
+        </figure>
+      </div>
+      <div class="lb-panel">
+        <div class="lb-text is-active" style="--i:0" data-lb="0">
+          <div class="lb-kicker">Ñanduti</div>
+          <h3 class="lb-title">Tejido como luz</h3>
+          <p class="lb-desc">Un vestido armado flor por flor: ruedas de ñanduti unidas a mano
+            con cordón trenzado, y un final de flecos que se mueve con cada paso.</p>
+          <p class="lb-desc">El ñanduti nace en Itauguá, tensado sobre un bastidor de madera.
+            Cada rueda empieza por un centro de hilos cruzados como rayos de sol y crece
+            en vueltas, nudo por nudo, hasta cerrar el dibujo.</p>
+          <p class="lb-desc">Una sola flor puede llevar un día entero de trabajo. Para este
+            vestido se tejieron decenas, una distinta de la otra, y después se unieron
+            sin costuras a la vista para que la tela parezca una sola pieza de encaje.</p>
+        </div>
+        <div class="lb-text" style="--i:1" data-lb="1">
+          <div class="lb-kicker">La colección</div>
+          <h3 class="lb-title">Blanco sobre blanco</h3>
+          <p class="lb-desc">Encaje, plisados, ñanduti y lienzo en una misma paleta: cuatro
+            maneras de llevar puesta la artesanía paraguaya, del día a la noche.</p>
+          <p class="lb-desc">Elegimos el blanco para que se lea la textura antes que el color:
+            la trama abierta del ñanduti, el relieve del encaje, el pliegue marcado del
+            lienzo. Sin estampados que distraigan, lo que habla es la mano.</p>
+          <p class="lb-desc">Cada prenda pasa por más de un taller. Una tejedora arma los
+            encajes, otra los une, y la costura final se hace en Asunción, donde se
+            ajustan largos y talles pieza por pieza.</p>
+        </div>
+        <div class="lb-text" style="--i:2" data-lb="2">
+          <div class="lb-kicker">Lienzo</div>
+          <h3 class="lb-title">Al caer la tarde</h3>
+          <p class="lb-desc">Chaleco y pantalón de lienzo crudo con paños a cuadros tejidos en
+            telar. Fresco y liviano, hecho para el verano paraguayo.</p>
+          <p class="lb-desc">El lienzo es algodón sin teñir: conserva su color natural y se
+            ablanda con cada lavado. Los paños a cuadros se tejen aparte, en telares de
+            pedal, y se aplican a mano sobre el corte.</p>
+          <p class="lb-desc">Es la ropa de siempre del campo paraguayo, vuelta a pensar para
+            la ciudad: cortes rectos, bolsillos amplios y botones de madera.</p>
+        </div>
       </div>
     </div>
   </section>
@@ -996,9 +1203,22 @@
     <div class="footer-bottom">
       <span>© <span id="year"></span> SOLAR GUARANI — Paraguay</span>
       <span>Hecho a mano, con orgullo guaraní</span>
+      <span>Página hecha por <a class="footer-credit" href="https://maintechnologies.dev" target="_blank" rel="noopener">maintechnologies.dev</a></span>
     </div>
   </div>
 </footer>
+
+<!-- ── ÁLBUM (fotos del lookbook) ─────────────────────────── -->
+<dialog class="album" id="album" aria-label="Nuestro álbum">
+  <div class="album-count" id="album-count"></div>
+  <button class="album-close" type="button" onclick="closeAlbum()" aria-label="Cerrar álbum">&times;</button>
+  <button class="album-nav prev" type="button" onclick="stepAlbum(-1)" aria-label="Foto anterior">&#8249;</button>
+  <figure class="album-fig">
+    <img id="album-img" alt="">
+    <figcaption class="album-cap" id="album-cap"></figcaption>
+  </figure>
+  <button class="album-nav next" type="button" onclick="stepAlbum(1)" aria-label="Foto siguiente">&#8250;</button>
+</dialog>
 
 <!-- ── FLOAT WHATSAPP ─────────────────────────────────────── -->
 <a class="float-btn" id="float-wa" href="#" target="_blank" rel="noopener noreferrer" aria-label="Escribinos por WhatsApp">
@@ -1852,6 +2072,73 @@ loadData().then(routeFromUrl);
   }, { rootMargin: '200px 0px', threshold: 0.15 });
 
   vids.forEach(v => io.observe(v));
+})();
+
+// ── Lookbook: el texto de la derecha sigue a la foto ─────
+// Ver el CSS de .lb-panel. La foto activa es la que cruza la línea
+// del medio de la pantalla (el rootMargin deja solo esa franja).
+(function initLookbook() {
+  const figs = document.querySelectorAll('.lb-media[data-lb]');
+  if (!figs.length || !('IntersectionObserver' in window)) return;
+  const texts = document.querySelectorAll('.lb-text[data-lb]');
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      const i = e.target.dataset.lb;
+      texts.forEach(t => t.classList.toggle('is-active', t.dataset.lb === i));
+    });
+  }, { rootMargin: '-50% 0px -50% 0px' });
+  figs.forEach(f => io.observe(f));
+})();
+
+// ── Álbum del lookbook ────────────────────────────────────
+// Las fotos salen del lookbook de la portada (cada .lb-media con
+// su .lb-text del mismo data-lb: foto grande, alt y título), así
+// que para sumar una foto al álbum alcanza con sumar una foto y su
+// texto al lookbook: no hay otra lista que mantener.
+let albumIdx = 0;
+function albumPhotos() {
+  return [...document.querySelectorAll('.lb-media')].map(f => {
+    const img = f.querySelector('img');
+    const text = document.querySelector(`.lb-text[data-lb="${f.dataset.lb}"]`);
+    return { src: img.getAttribute('src'), alt: img.alt, title: text.querySelector('.lb-title').textContent };
+  });
+}
+function showAlbum(i) {
+  const photos = albumPhotos();
+  albumIdx = (i + photos.length) % photos.length;
+  const p = photos[albumIdx];
+  const img = document.getElementById('album-img');
+  img.src = p.src; img.alt = p.alt;
+  document.getElementById('album-cap').textContent = p.title;
+  document.getElementById('album-count').textContent = `${albumIdx + 1} / ${photos.length}`;
+}
+function openAlbum(i) {
+  const dlg = document.getElementById('album');
+  showAlbum(i);
+  if (!dlg.open) { dlg.showModal(); document.documentElement.style.overflow = 'hidden'; }
+}
+function closeAlbum() { document.getElementById('album').close(); }
+function stepAlbum(d) { showAlbum(albumIdx + d); }
+
+(function initAlbum() {
+  const dlg = document.getElementById('album');
+  dlg.addEventListener('close', () => { document.documentElement.style.overflow = ''; });
+  // Clic en el fondo oscuro (fuera de la foto y los botones) cierra
+  dlg.addEventListener('click', e => { if (e.target === dlg) closeAlbum(); });
+  dlg.addEventListener('keydown', e => {
+    if (e.key === 'ArrowLeft') stepAlbum(-1);
+    if (e.key === 'ArrowRight') stepAlbum(1);
+  });
+  // Deslizar en el celular
+  let x0 = null;
+  dlg.addEventListener('touchstart', e => { x0 = e.touches[0].clientX; }, { passive: true });
+  dlg.addEventListener('touchend', e => {
+    if (x0 === null) return;
+    const dx = e.changedTouches[0].clientX - x0;
+    if (Math.abs(dx) > 50) stepAlbum(dx < 0 ? 1 : -1);
+    x0 = null;
+  });
 })();
 
 // Ocultar splash cuando todo está listo
